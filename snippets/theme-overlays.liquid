@@ -1,0 +1,415 @@
+{% doc %}
+  Renders the theme's global overlay shell: the mobile menu drawer, cart
+  drawer, quick view modal, a generic reusable modal, the search overlay,
+  and the back-to-top button. Rendered once from layout/theme.liquid, at
+  the end of <body>.
+
+  Every dialog here shares the same open/close mechanics
+  (assets/component-dialog.js, matched via data-component="dialog") — only
+  the search overlay has real content this phase, since a functional search
+  form is global-shell behaviour. The menu, cart, and quick view bodies are
+  intentionally empty: their content depends on the header's menu, the
+  cart's line items, and a product's data respectively, which belong to
+  later phases that build those features. Wiring an actual trigger (e.g.
+  the header's cart icon getting `data-dialog-open="cart-drawer"`) is that
+  later phase's job too — this snippet only guarantees the target exists.
+
+  @example
+  {% render 'theme-overlays' %}
+{% enddoc %}
+
+{% liquid
+  assign close_label = 'general.accessibility.close' | t
+  assign back_to_top_label = 'general.accessibility.back_to_top' | t
+  assign mobile_menu = linklists['main-menu']
+%}
+
+<div
+  id="menu-drawer"
+  class="drawer"
+  data-component="dialog"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="menu-drawer-title"
+  aria-hidden="true"
+  hidden
+>
+  <div class="drawer__backdrop" data-dialog-close></div>
+  <div class="drawer__panel">
+    <div class="drawer__header">
+      <h2 id="menu-drawer-title" class="text-h6">{{ 'general.menu_title' | t }}</h2>
+      <button type="button" class="btn btn--icon" data-dialog-close>
+        {% render 'icon', name: 'close' %}
+        {% render 'visually-hidden', text: close_label %}
+      </button>
+    </div>
+    <nav class="drawer__body mobile-nav" data-component="mobile-nav" aria-label="{{ 'general.menu_title' | t }}">
+      <ul class="mobile-nav__list">
+        {% for link in mobile_menu.links %}
+          <li class="mobile-nav__item">
+            {% if link.links.size > 0 %}
+              <button
+                type="button"
+                class="mobile-nav__trigger"
+                aria-expanded="false"
+                aria-controls="mobile-nav-panel-{{ forloop.index0 }}"
+                data-accordion-trigger
+              >
+                <span>{{ link.title }}</span>
+                {% render 'icon', name: 'chevron-down' %}
+              </button>
+              <div class="mobile-nav__panel" id="mobile-nav-panel-{{ forloop.index0 }}">
+                <ul class="mobile-nav__sublist">
+                  {% for child in link.links %}
+                    <li><a href="{{ child.url }}">{{ child.title }}</a></li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% else %}
+              <a href="{{ link.url }}" class="mobile-nav__link">{{ link.title }}</a>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+
+      {% if settings.mobile_nav_banner_image %}
+        <a href="{{ settings.mobile_nav_banner_link | default: '#' }}" class="mobile-nav__banner">
+          {% render 'image', image: settings.mobile_nav_banner_image, class: 'mobile-nav__banner-image ratio-landscape' %}
+          {% if settings.mobile_nav_banner_heading != blank %}
+            <span class="text-product-title">{{ settings.mobile_nav_banner_heading }}</span>
+          {% endif %}
+        </a>
+      {% endif %}
+
+      <div class="mobile-nav__footer">
+        {% if shop.customer_accounts_enabled %}
+          <a href="{{ routes.account_url }}" class="mobile-nav__link">{{ 'header.account' | t }}</a>
+        {% endif %}
+        {% render 'localization-selector', show_currency: settings.show_currency_selector, show_language: settings.show_language_selector %}
+      </div>
+    </nav>
+  </div>
+</div>
+
+<div
+  id="cart-drawer"
+  class="drawer"
+  data-component="dialog"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="cart-drawer-title"
+  aria-hidden="true"
+  hidden
+>
+  <div class="drawer__backdrop" data-dialog-close></div>
+  <div class="drawer__panel">
+    <div class="drawer__header">
+      <h2 id="cart-drawer-title" class="text-h6">{{ 'cart.title' | t }}</h2>
+      <button type="button" class="btn btn--icon" data-dialog-close>
+        {% render 'icon', name: 'close' %}
+        {% render 'visually-hidden', text: close_label %}
+      </button>
+    </div>
+    <div class="drawer__body" data-component="cart-drawer-content">
+      {% section 'cart-drawer' %}
+    </div>
+  </div>
+</div>
+
+<div
+  id="quick-view"
+  class="modal"
+  data-component="dialog"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="quick-view-title"
+  aria-hidden="true"
+  hidden
+>
+  <div class="modal__backdrop" data-dialog-close></div>
+  <div class="modal__panel">
+    <div class="modal__header">
+      <h2 id="quick-view-title" class="text-h6">{{ 'quick_view.title' | t }}</h2>
+      <button type="button" class="btn btn--icon" data-dialog-close>
+        {% render 'icon', name: 'close' %}
+        {% render 'visually-hidden', text: close_label %}
+      </button>
+    </div>
+    <div class="modal__body">
+      {% comment %} Populated once product templates are built. {% endcomment %}
+    </div>
+  </div>
+</div>
+
+<div
+  id="modal"
+  class="modal"
+  data-component="dialog"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="modal-title"
+  aria-hidden="true"
+  hidden
+>
+  <div class="modal__backdrop" data-dialog-close></div>
+  <div class="modal__panel">
+    <div class="modal__header">
+      <h2 id="modal-title" class="text-h6 visually-hidden">{{ 'general.accessibility.close' | t }}</h2>
+      <button type="button" class="btn btn--icon" data-dialog-close>
+        {% render 'icon', name: 'close' %}
+        {% render 'visually-hidden', text: close_label %}
+      </button>
+    </div>
+    <div class="modal__body">
+      {% comment %} A generic reusable modal — size guides, video, etc. Content is set by whichever future feature opens it. {% endcomment %}
+    </div>
+  </div>
+</div>
+
+<div
+  id="search-overlay"
+  class="modal"
+  data-component="dialog"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="search-overlay-title"
+  aria-hidden="true"
+  hidden
+>
+  <div class="modal__backdrop" data-dialog-close></div>
+  <div class="modal__panel">
+    <div class="modal__header">
+      <h2 id="search-overlay-title" class="text-h6 visually-hidden">{{ 'search.title' | t }}</h2>
+      <button type="button" class="btn btn--icon" data-dialog-close>
+        {% render 'icon', name: 'close' %}
+        {% render 'visually-hidden', text: close_label %}
+      </button>
+    </div>
+    <div class="modal__body">
+      <form
+        action="{{ routes.search_url }}"
+        method="get"
+        role="search"
+        class="search-field"
+        data-component="predictive-search"
+      >
+        {% render 'icon', name: 'search' %}
+        <input
+          type="search"
+          name="q"
+          placeholder="{{ 'search.placeholder' | t }}"
+          value="{{ search.terms | escape }}"
+          autocomplete="off"
+          data-dialog-focus
+        >
+        <button type="submit" class="visually-hidden--inline">{{ 'search.submit' | t }}</button>
+
+        <div class="search-overlay__panel" data-default-state>
+          {% liquid
+            assign suggested_terms = settings.search_suggested_terms | newline_to_br | split: '<br />'
+          %}
+          {% if suggested_terms.size > 0 %}
+            <div class="search-overlay__section">
+              <p class="text-eyebrow">{{ 'search.suggested_searches' | t }}</p>
+              <ul class="predictive-search__suggestions">
+                {% for term in suggested_terms %}
+                  {% assign term = term | strip %}
+                  {% if term != blank %}
+                    <li><a href="{{ routes.search_url }}?q={{ term | url_param_escape }}">{{ term }}</a></li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          <div class="search-overlay__section" data-recent-searches hidden>
+            <div class="search-overlay__section-head">
+              <p class="text-eyebrow">{{ 'search.recent_searches' | t }}</p>
+              <button type="button" class="btn--text" data-clear-recent>{{ 'search.clear_recent' | t }}</button>
+            </div>
+            <ul class="predictive-search__suggestions" data-recent-searches-list></ul>
+          </div>
+
+          {% if settings.search_trending_collection != blank %}
+            <div class="search-overlay__section">
+              <p class="text-eyebrow">{{ 'search.trending_products' | t }}</p>
+              <ul class="predictive-search__products">
+                {% for product in settings.search_trending_collection.products limit: 4 %}
+                  <li>
+                    <a href="{{ product.url }}" class="predictive-search__product">
+                      {% render 'image', image: product.featured_image, class: 'predictive-search__product-image ratio-square', width: 160 %}
+                      <span class="text-product-title">{{ product.title }}</span>
+                      <span class="text-product-price">{{ product.price | money }}</span>
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="search-overlay__panel" data-predictive-search-results hidden></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<button
+  type="button"
+  id="back-to-top"
+  class="back-to-top"
+  data-component="back-to-top"
+>
+  {% render 'icon', name: 'arrow-up' %}
+  {% render 'visually-hidden', text: back_to_top_label %}
+</button>
+
+{% stylesheet %}
+  /* ---------- Mobile navigation ---------- */
+  .mobile-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    padding: var(--space-lg);
+    overflow-y: auto;
+    height: 100%;
+  }
+  .mobile-nav__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .mobile-nav__item {
+    border-bottom: 1px solid var(--color-line);
+  }
+  .mobile-nav__link,
+  .mobile-nav__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding-block: var(--space-md);
+    font-family: var(--font-display--family);
+    font-size: var(--font-size-h6);
+    text-align: left;
+    background: none;
+    border: none;
+    color: var(--color-foreground);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .mobile-nav__trigger .icon {
+    transition: transform var(--duration-fast) var(--ease-signature);
+  }
+  .mobile-nav__trigger[aria-expanded="true"] .icon {
+    transform: rotate(180deg);
+  }
+  .mobile-nav__panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--duration-base) var(--ease-out-soft);
+  }
+  .mobile-nav__panel.is-open {
+    grid-template-rows: 1fr;
+  }
+  .mobile-nav__sublist {
+    overflow: hidden;
+    list-style: none;
+    margin: 0;
+    padding: 0 0 var(--space-md) var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  .mobile-nav__sublist a {
+    text-decoration: none;
+    color: var(--color-foreground-soft);
+  }
+  .mobile-nav__banner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    text-decoration: none;
+  }
+  .mobile-nav__banner-image.image > img {
+    height: 100%;
+    object-fit: cover;
+  }
+  .mobile-nav__footer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-line);
+  }
+  .mobile-nav__footer .mobile-nav__link {
+    padding-block: 0;
+    font-family: var(--font-primary--family);
+    font-size: var(--font-size-body);
+  }
+
+  /* ---------- Search overlay ---------- */
+  .search-field {
+    position: relative;
+    flex-wrap: wrap;
+  }
+  .search-overlay__panel {
+    flex-basis: 100%;
+    margin-top: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+  .search-overlay__section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .predictive-search__suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+    list-style: none;
+    margin: var(--space-sm) 0 0;
+    padding: 0;
+  }
+  .predictive-search__pill {
+    font-size: var(--font-size-small);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-pill);
+    padding: var(--space-3xs) var(--space-sm);
+    background: none;
+    cursor: pointer;
+  }
+  .predictive-search__suggestions a {
+    display: inline-block;
+    font-size: var(--font-size-small);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-pill);
+    padding: var(--space-3xs) var(--space-sm);
+    text-decoration: none;
+  }
+  .predictive-search__products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+    gap: var(--space-md);
+    list-style: none;
+    margin: var(--space-sm) 0 0;
+    padding: 0;
+  }
+  .predictive-search__product {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    text-decoration: none;
+  }
+  .predictive-search__product-image.image > img {
+    height: 100%;
+    object-fit: cover;
+  }
+  .predictive-search__empty {
+    color: var(--color-foreground-soft);
+  }
+{% endstylesheet %}

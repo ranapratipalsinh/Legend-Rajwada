@@ -1,0 +1,85 @@
+{% doc %}
+  Renders a row of share links for the current page (X, Facebook,
+  Pinterest, email, copy-link). Each is a plain, no-JS-required link to the
+  platform's own share endpoint except "copy link", which is progressively
+  enhanced by assets/component-social-share.js when JavaScript is available.
+
+  @param {string} [url] - The URL being shared. Defaults to canonical_url
+  @param {string} [title] - The share title. Defaults to page_title
+  @param {string} [image] - An image URL, used by Pinterest only
+
+  @example
+  {% render 'social-share' %}
+  {% render 'social-share', url: product.url, title: product.title, image: product.featured_image | image_url: width: 1200 %}
+{% enddoc %}
+
+{% liquid
+  assign share_url = url | default: canonical_url
+  assign share_title = title | default: page_title
+  assign label_x = 'social.share_on_x' | t
+  assign label_facebook = 'social.share_on_facebook' | t
+  assign label_pinterest = 'social.share_on_pinterest' | t
+  assign label_email = 'social.share_via_email' | t
+  assign label_copy = 'social.copy_link' | t
+%}
+
+<ul class="social-share" data-component="social-share" data-share-url="{{ share_url }}">
+  <li>
+    <a
+      href="https://twitter.com/intent/tweet?text={{ share_title | url_param_escape }}&url={{ share_url | url_param_escape }}"
+      target="_blank"
+      rel="noopener"
+      class="btn btn--icon"
+    >
+      {% render 'icon', name: 'x' %}
+      {% render 'visually-hidden', text: label_x %}
+    </a>
+  </li>
+  <li>
+    <a
+      href="https://www.facebook.com/sharer/sharer.php?u={{ share_url | url_param_escape }}"
+      target="_blank"
+      rel="noopener"
+      class="btn btn--icon"
+    >
+      {% render 'icon', name: 'facebook' %}
+      {% render 'visually-hidden', text: label_facebook %}
+    </a>
+  </li>
+  <li>
+    <a
+      href="https://pinterest.com/pin/create/button/?url={{ share_url | url_param_escape }}&description={{ share_title | url_param_escape }}{% if image %}&media={{ image | url_param_escape }}{% endif %}"
+      target="_blank"
+      rel="noopener"
+      class="btn btn--icon"
+    >
+      {% render 'icon', name: 'pinterest' %}
+      {% render 'visually-hidden', text: label_pinterest %}
+    </a>
+  </li>
+  <li>
+    <a
+      href="mailto:?subject={{ share_title | url_param_escape }}&body={{ share_url | url_param_escape }}"
+      class="btn btn--icon"
+    >
+      {% render 'icon', name: 'mail' %}
+      {% render 'visually-hidden', text: label_email %}
+    </a>
+  </li>
+  <li>
+    <button type="button" class="btn btn--icon" data-social-share-copy data-copied-text="{{ 'social.link_copied' | t }}">
+      {% render 'icon', name: 'link' %}
+      {% render 'visually-hidden', text: label_copy %}
+    </button>
+  </li>
+</ul>
+
+{% stylesheet %}
+  .social-share {
+    display: flex;
+    gap: var(--space-2xs);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+{% endstylesheet %}

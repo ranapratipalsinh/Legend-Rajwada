@@ -1,0 +1,113 @@
+{% doc %}
+  Renders one line item row inside the cart drawer: thumbnail, title,
+  variant options, a quantity stepper, a remove button, and the line price.
+  Pure presentation — assets/component-cart-drawer.js owns the fetch calls
+  that quantity/remove buttons trigger.
+
+  @param {object} line_item - A cart line item (from cart.items)
+
+  @example
+  {% for line_item in cart.items %}
+    {% render 'cart-line-item', line_item: line_item %}
+  {% endfor %}
+{% enddoc %}
+
+<div class="cart-line" data-cart-line="{{ line_item.key }}">
+  {% render 'image', image: line_item.image, url: line_item.url, class: 'cart-line__image ratio-square', width: 160 %}
+
+  <div class="cart-line__body">
+    <a href="{{ line_item.url }}" class="cart-line__title text-product-title">{{ line_item.product.title }}</a>
+
+    {% if line_item.variant.title != 'Default Title' %}
+      <p class="cart-line__variant text-caption">{{ line_item.variant.title }}</p>
+    {% endif %}
+
+    <div class="cart-line__footer">
+      <div class="quantity-stepper">
+        <button
+          type="button"
+          class="quantity-stepper__button"
+          data-cart-quantity-decrease
+          aria-label="{{ 'cart.quantity' | t }} -1"
+        >&minus;</button>
+        <span class="quantity-stepper__value" data-cart-quantity-value aria-live="polite">{{ line_item.quantity }}</span>
+        <button
+          type="button"
+          class="quantity-stepper__button"
+          data-cart-quantity-increase
+          aria-label="{{ 'cart.quantity' | t }} +1"
+        >+</button>
+      </div>
+
+      <button type="button" class="btn--text cart-line__remove" data-cart-remove>
+        {{ 'cart.remove' | t }}
+      </button>
+    </div>
+  </div>
+
+  <p class="cart-line__price text-product-price">{{ line_item.final_line_price | money }}</p>
+</div>
+
+{% stylesheet %}
+  .cart-line {
+    display: grid;
+    grid-template-columns: 5rem 1fr auto;
+    gap: var(--space-sm);
+    padding-block: var(--space-md);
+    border-bottom: 1px solid var(--color-line);
+  }
+  .cart-line__image {
+    width: 5rem;
+  }
+  /* Higher specificity than snippets/image.liquid's own `.image > img` rule
+     on purpose — that rule sets height:auto, which would fight the
+     aspect-ratio box .ratio-square establishes. Never rely on file load
+     order to resolve a style conflict; win it on specificity instead. */
+  .cart-line__image.image > img {
+    height: 100%;
+    object-fit: cover;
+  }
+  .cart-line__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+  }
+  .cart-line__title {
+    text-decoration: none;
+  }
+  .cart-line__variant {
+    color: var(--color-foreground-soft);
+  }
+  .cart-line__footer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-top: var(--space-2xs);
+  }
+  .cart-line__price {
+    white-space: nowrap;
+  }
+
+  .quantity-stepper {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    border: 1px solid var(--color-line);
+    border-radius: var(--style-border-radius-inputs, var(--radius-sm));
+    padding-inline: var(--space-2xs);
+  }
+  .quantity-stepper__button {
+    background: none;
+    border: none;
+    font-size: var(--font-size-body);
+    line-height: 1;
+    padding: var(--space-2xs);
+    cursor: pointer;
+    color: var(--color-foreground);
+  }
+  .quantity-stepper__value {
+    min-width: 1.5rem;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+{% endstylesheet %}

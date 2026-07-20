@@ -1,0 +1,22 @@
+{% doc %}
+  Renders a small loading spinner with an accessible status announcement.
+  For a button's own loading state, use the `loading` param on
+  snippets/button.liquid instead — this snippet is for standalone loading
+  moments (a drawer fetching its contents, a search overlay awaiting results).
+
+  @param {string} [text] - The text announced to screen readers. Defaults to "Loading"
+
+  @example
+  {% render 'spinner' %}
+  {% render 'spinner', text: 'Loading results' %}
+{% enddoc %}
+
+{% liquid
+  unless text
+    assign text = 'general.accessibility.loading' | t
+  endunless
+%}
+
+<span class="spinner" role="status">
+  {% render 'visually-hidden', text: text %}
+</span>

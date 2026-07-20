@@ -1,0 +1,93 @@
+{% comment %}
+  Rendered two ways, never added via the theme editor's section picker
+  (no presets, on purpose — this is utility markup, not a page section):
+  1. Statically, from snippets/theme-overlays.liquid, on first page load.
+  2. Re-fetched by assets/component-cart-drawer.js via Shopify's Section
+     Rendering API (`sections=cart-drawer`) after every quantity/remove
+     change, so the cart's line items are always defined once, here, and
+     never duplicated in JavaScript.
+{% endcomment %}
+
+{% liquid
+  assign continue_shopping_label = 'cart.continue_shopping' | t
+  assign checkout_label = 'cart.checkout' | t
+%}
+
+<div class="cart-drawer-content">
+  {% if cart.item_count == 0 %}
+    <div class="cart-drawer-empty">
+      <p class="text-h6">{{ 'cart.empty_title' | t }}</p>
+      <p class="text-caption">{{ 'cart.empty_message' | t }}</p>
+      {% render 'button', text: continue_shopping_label, url: routes.root_url, style: 'secondary' %}
+    </div>
+  {% else %}
+    <div class="cart-drawer-content__lines">
+      {% for line_item in cart.items %}
+        {% render 'cart-line-item', line_item: line_item %}
+      {% endfor %}
+    </div>
+
+    <div class="cart-drawer-content__footer">
+      <div class="cart-drawer-content__subtotal">
+        <span class="text-body-lg">{{ 'cart.subtotal' | t }}</span>
+        <span class="text-product-price">{{ cart.total_price | money }}</span>
+      </div>
+      <div class="cart-drawer-content__actions">
+        {% render 'button', text: continue_shopping_label, url: routes.root_url, style: 'secondary' %}
+        {% render 'button', text: checkout_label, url: routes.checkout_url, style: 'primary' %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  /* Neutralize the .shopify-section content-grid from assets/critical.css —
+     this renders inside a fixed-width drawer panel, not the page column,
+     and the ID selector's specificity wins regardless of file load order. */
+  #shopify-section-cart-drawer {
+    display: block;
+    height: 100%;
+  }
+
+  .cart-drawer-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .cart-drawer-content__lines {
+    flex: 1;
+    overflow-y: auto;
+  }
+  .cart-drawer-content__footer {
+    border-top: 1px solid var(--color-line);
+    padding-top: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  .cart-drawer-content__subtotal {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .cart-drawer-content__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .cart-drawer-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    padding-block: var(--space-xl);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.cart",
+  "settings": []
+}
+{% endschema %}

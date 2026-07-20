@@ -1,0 +1,12 @@
+{% doc %}
+  Renders text that is read by screen readers but never shown visually.
+  Use for icon-only buttons, status announcements, and skip links' target
+  labels — anywhere meaning exists that has no on-screen text to carry it.
+
+  @param {string} text - The text to expose to assistive technology
+
+  @example
+  {% render 'visually-hidden', text: 'Loading' %}
+{% enddoc %}
+
+<span class="visually-hidden">{{ text }}</span>

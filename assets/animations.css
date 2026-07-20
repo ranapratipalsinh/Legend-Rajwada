@@ -1,0 +1,111 @@
+/**
+ * Animation foundation.
+ *
+ * Tokens only travel one direction: duration/easing values live in
+ * assets/variables.css, get consumed here as keyframes and reveal
+ * contracts, and are triggered from assets/motion.js. No page, section or
+ * component applies any of this yet — that's deliberate. This file defines
+ * the vocabulary components will opt into later via a single data
+ * attribute each, not a bespoke animation per component.
+ */
+
+/* ---------- Hover motion ----------
+   Reference values — components apply these directly rather than a class,
+   since a hover transition is usually one property on an existing rule.
+   Documented here so every component reaches for the same numbers:
+   - micro feedback (button press, icon tap):  var(--duration-instant), var(--ease-signature)
+   - hover state (link, card, button):          var(--duration-fast),    var(--ease-signature)
+   - panel/drawer reveal:                       var(--duration-base),    var(--ease-out-soft)
+   - editorial / image reveal:                  var(--duration-slow),    var(--ease-out-soft)
+*/
+
+/* ---------- Scroll-triggered entrance contract ----------
+   assets/motion.js toggles [data-reveal] elements to .is-visible via
+   IntersectionObserver. The CSS owns the visual states; JS only owns the
+   timing decision of *when* to flip the class. */
+[data-reveal] {
+  opacity: 0;
+  transition: opacity var(--duration-slow) var(--ease-out-soft), transform var(--duration-slow) var(--ease-out-soft);
+}
+[data-reveal].is-visible {
+  opacity: 1;
+}
+
+[data-reveal="up"] { transform: translateY(1.5rem); }
+[data-reveal="up"].is-visible { transform: none; }
+
+[data-reveal="fade"] { transform: none; }
+
+[data-reveal="scale"] { transform: scale(0.97); }
+[data-reveal="scale"].is-visible { transform: none; }
+
+/* Staggered groups: children opt in with [data-reveal-child] and motion.js
+   assigns an incrementing transition-delay via --reveal-delay. */
+[data-reveal-child] {
+  transition-delay: calc(var(--reveal-index, 0) * 80ms);
+}
+
+/* ---------- Image reveal ----------
+   A slow, deliberate zoom on hover for product/editorial imagery — never a
+   snap-to-scale. Pair with overflow: hidden on the parent. */
+[data-media-zoom] {
+  overflow: hidden;
+}
+[data-media-zoom] img,
+[data-media-zoom] video {
+  transition: transform var(--duration-slow) var(--ease-signature);
+}
+[data-media-zoom]:hover img,
+[data-media-zoom]:hover video {
+  transform: scale(1.04);
+}
+
+/* ---------- Text reveal ----------
+   Line-by-line reveal contract: motion.js splits [data-reveal-text] into
+   lines at runtime and animates each with a short stagger. Until JS runs,
+   the text renders normally — content is never hidden behind JavaScript. */
+[data-reveal-text] .line {
+  overflow: hidden;
+  display: block;
+}
+[data-reveal-text] .line > span {
+  display: inline-block;
+  transform: translateY(100%);
+  transition: transform var(--duration-base) var(--ease-out-soft);
+}
+[data-reveal-text].is-visible .line > span {
+  transform: none;
+}
+
+/* ---------- Shared keyframes ----------
+   Referenced from multiple files (assets/buttons.css's loading state,
+   assets/components.css's standalone spinner) so the motion only has one
+   definition. */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------- Component entrance (theme editor) ----------
+   Every section gets this for free so a merchant adding a new section in
+   the theme editor sees it settle in, not pop. */
+.shopify-section {
+  animation: section-settle var(--duration-base) var(--ease-out-soft);
+}
+@keyframes section-settle {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  [data-reveal="up"],
+  [data-reveal="scale"],
+  [data-reveal-text] .line > span {
+    opacity: 1;
+    transform: none;
+  }
+  [data-media-zoom]:hover img,
+  [data-media-zoom]:hover video {
+    transform: none;
+  }
+}

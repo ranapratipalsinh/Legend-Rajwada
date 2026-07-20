@@ -1,0 +1,56 @@
+{% doc %}
+  Renders the currency and/or language selector. Each is its own small
+  `localization` form, auto-submitting on change — no JavaScript required,
+  though the browser's native form submission does mean a full page
+  navigation on change, which is the correct, predictable behaviour for
+  something that changes prices and translations everywhere on the page.
+
+  @param {boolean} [show_currency] - Renders the currency/region selector
+  @param {boolean} [show_language] - Renders the language selector
+
+  @example
+  {% render 'localization-selector', show_currency: true, show_language: true %}
+{% enddoc %}
+
+{% if show_currency and localization.available_countries.size > 1 %}
+  {% form 'localization' %}
+    <div class="localization-field">
+      <label class="visually-hidden" for="localization-currency">{{ 'localization.currency_label' | t }}</label>
+      <select name="country_code" id="localization-currency" class="localization-field__select" onchange="this.form.submit()">
+        {% for country in localization.available_countries %}
+          <option value="{{ country.iso_code }}" {% if country.iso_code == localization.country.iso_code %}selected{% endif %}>
+            {{ country.name }} ({{ country.currency.iso_code }})
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+  {% endform %}
+{% endif %}
+
+{% if show_language and localization.available_languages.size > 1 %}
+  {% form 'localization' %}
+    <div class="localization-field">
+      <label class="visually-hidden" for="localization-language">{{ 'localization.language_label' | t }}</label>
+      <select name="locale_code" id="localization-language" class="localization-field__select" onchange="this.form.submit()">
+        {% for language in localization.available_languages %}
+          <option value="{{ language.iso_code }}" {% if language.iso_code == localization.language.iso_code %}selected{% endif %}>
+            {{ language.endonym_name | capitalize }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+  {% endform %}
+{% endif %}
+
+{% stylesheet %}
+  .localization-field select {
+    font-family: var(--font-primary--family);
+    font-size: var(--font-size-caption);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    background: transparent;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+  }
+{% endstylesheet %}

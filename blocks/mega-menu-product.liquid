@@ -1,0 +1,28 @@
+{% doc %}
+  Defines the settings surface for a "featured product" mega menu
+  attachment. Not rendered directly — see blocks/mega-menu-collection.liquid's
+  doc comment for why, and snippets/mega-menu.liquid for where its
+  settings are actually consumed.
+
+  @example
+  Not rendered directly — see snippets/mega-menu.liquid.
+{% enddoc %}
+
+{% schema %}
+{
+  "name": "t:general.mega_menu",
+  "settings": [
+    {
+      "type": "text",
+      "id": "menu_item_title",
+      "label": "t:labels.menu_item_title",
+      "info": "t:info.menu_item_title"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:labels.product"
+    }
+  ]
+}
+{% endschema %}

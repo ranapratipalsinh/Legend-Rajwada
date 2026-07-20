@@ -1,0 +1,136 @@
+{%- liquid
+  assign body_class = 'template-' | append: request.page_type
+  if template.suffix
+    assign body_class = body_class | append: ' template-' | append: request.page_type | append: '--' | append: template.suffix | handleize
+  endif
+-%}
+<!doctype html>
+<html
+  lang="{{ request.locale.iso_code }}"
+  data-motion="{% if settings.enable_decorative_motion %}enabled{% else %}reduced{% endif %}"
+>
+  <head>
+    {% # Inlined CSS Variables %}
+    {% render 'css-variables' %}
+
+    {% comment %}
+      Font preloading:
+      1. Preconnect to font CDN for faster connection
+      2. Preload only the critical font variant (base weight)
+      3. Additional variants load on-demand via @font-face
+    {% endcomment %}
+    {% unless settings.type_primary_font.system? %}
+      <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+
+      {% comment %} Preload the base font variant for initial page render {% endcomment %}
+      {{ settings.type_primary_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
+    {% endunless %}
+    {% unless settings.type_display_font.system? %}
+      {{ settings.type_display_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
+    {% endunless %}
+
+    {% # Load and preload the critical CSS %}
+    {{ 'critical.css' | asset_url | stylesheet_tag: preload: true }}
+
+    {%- comment -%}
+      Global foundation — render-blocking. Each file owns one responsibility
+      (see assets/*.css headers); together they're what stands between a
+      blank page and unstyled content, so they load before content_for_layout
+      the same way critical.css does.
+    {%- endcomment -%}
+    {{ 'reset.css' | asset_url | stylesheet_tag }}
+    {{ 'variables.css' | asset_url | stylesheet_tag }}
+    {{ 'typography.css' | asset_url | stylesheet_tag }}
+    {{ 'layout.css' | asset_url | stylesheet_tag }}
+    {{ 'buttons.css' | asset_url | stylesheet_tag }}
+    {{ 'forms.css' | asset_url | stylesheet_tag }}
+    {{ 'utilities.css' | asset_url | stylesheet_tag }}
+
+    {%- comment -%}
+      Non-critical global layers — deferred with the preload/onload swap so
+      they never block first paint. Neither badges/breadcrumbs (components.css)
+      nor scroll-reveal keyframes (animations.css) are needed before a visitor
+      can see and read the page.
+    {%- endcomment -%}
+    {%- comment -%}
+      media="print" doesn't apply to screens, so the browser fetches these
+      without blocking the render; the onload swap then applies them as
+      soon as they're in — the standard non-blocking CSS pattern.
+    {%- endcomment -%}
+    <link rel="stylesheet" href="{{ 'components.css' | asset_url }}" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{{ 'animations.css' | asset_url }}" media="print" onload="this.media='all'">
+    <noscript>
+      {{ 'components.css' | asset_url | stylesheet_tag }}
+      {{ 'animations.css' | asset_url | stylesheet_tag }}
+    </noscript>
+
+    {% # Social, title, etc. %}
+    {% render 'meta-tags' %}
+
+    {{ content_for_header }}
+  </head>
+
+  <body class="{{ body_class }}">
+    {%- comment -%}
+      Skip link — the very first focusable element on the page, per WCAG
+      2.4.1. Visually hidden until it receives keyboard focus (see
+      .skip-link in assets/components.css), so sighted mouse users never
+      see it while keyboard/screen-reader users can jump straight past the
+      header group to #main-content.
+    {%- endcomment -%}
+    <a class="skip-link" href="#main-content">{{ 'general.accessibility.skip_to_content' | t }}</a>
+
+    {%- comment -%}
+      Vendor asset map for on-demand loading (see assets/scroll.js,
+      assets/motion.js, assets/carousel.js). Populated with asset_url so the
+      CDN-hashed paths are correct; the files themselves must be vendored in
+      by hand — see each module's header comment.
+    {%- endcomment -%}
+    {%- # theme-check-disable MissingAsset -%}
+    {%- comment -%}
+      These five files are not part of this build — see the header comment
+      in each of assets/scroll.js, assets/motion.js and assets/carousel.js
+      for the exact package + filename to vendor in before shipping.
+      MissingAsset is disabled for this block only, deliberately, rather
+      than theme-wide.
+    {%- endcomment -%}
+    <script>
+      window.theme = window.theme || {};
+      window.theme.assets = {
+        lenis: {{ 'vendor-lenis.js' | asset_url | json }},
+        gsap: {{ 'vendor-gsap.js' | asset_url | json }},
+        gsapScrollTrigger: {{ 'vendor-gsap-scrolltrigger.js' | asset_url | json }},
+        swiperJs: {{ 'vendor-swiper.js' | asset_url | json }},
+        swiperCss: {{ 'vendor-swiper.css' | asset_url | json }}
+      };
+      window.theme.routes = {
+        predictiveSearchUrl: {{ routes.predictive_search_url | json }}
+      };
+      window.theme.moneyFormat = {{ shop.money_format | json }};
+    </script>
+    {%- # theme-check-enable MissingAsset -%}
+    <script type="module" src="{{ 'theme.js' | asset_url }}"></script>
+
+    {%- comment -%}
+      Landmark structure: sections/header.liquid and sections/footer.liquid
+      already render their own <header>/<footer> elements — each is its own
+      banner/contentinfo landmark — so the wrappers below are plain,
+      non-landmark hooks (stable ids for sticky positioning), not a second
+      nested landmark. <main> is the one new landmark this phase adds,
+      since nothing upstream provides it.
+    {%- endcomment -%}
+    <div id="header-group">
+      {% sections 'header-group' %}
+    </div>
+
+    <main id="main-content" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
+
+    <div id="footer-group">
+      {% sections 'footer-group' %}
+    </div>
+
+    {% render 'theme-overlays' %}
+  </body>
+</html>

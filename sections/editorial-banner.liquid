@@ -1,0 +1,370 @@
+{% comment %}
+  Editorial Campaign Banner — the homepage's deliberate breather between
+  two evidence-heavy sections (Signature Collection before it, Craftsmanship
+  after). One image or video, one line, minimal interface — this section
+  should feel like a held breath, not another selling moment. Reuses
+  Hero's media-layering and reduced-motion patterns directly rather than
+  inventing a parallel system for what is structurally a quieter, single-
+  instance version of the same idea.
+{% endcomment %}
+
+{% liquid
+  assign desktop_image = section.settings.image
+  assign mobile_image = section.settings.mobile_image | default: section.settings.image
+  assign has_media = false
+  if desktop_image or mobile_image
+    assign has_media = true
+  endif
+
+  assign overlay_opacity = section.settings.overlay_opacity | default: 30 | times: 1.0 | divided_by: 100.0
+  assign animations_enabled = section.settings.enable_animations
+
+  assign has_primary_cta = false
+  if section.settings.cta_text != blank
+    if section.settings.cta_link != blank
+      assign has_primary_cta = true
+    endif
+  endif
+  assign has_secondary_cta = false
+  if section.settings.secondary_cta_text != blank
+    if section.settings.secondary_cta_link != blank
+      assign has_secondary_cta = true
+    endif
+  endif
+  assign has_any_cta = false
+  if has_primary_cta
+    assign has_any_cta = true
+  endif
+  if has_secondary_cta
+    assign has_any_cta = true
+  endif
+
+  assign position_parts = section.settings.content_position | split: '_'
+  if position_parts.size == 1
+    assign valign = 'center'
+    assign align = 'center'
+  else
+    assign valign = position_parts[0]
+    assign align = position_parts[1]
+  endif
+%}
+
+<section
+  class="editorial-banner"
+  data-component="editorial-banner"
+  data-animations="{{ animations_enabled }}"
+  data-height="{{ section.settings.height }}"
+  data-align="{{ align }}"
+  data-valign="{{ valign }}"
+  style="--editorial-banner-overlay-opacity: {{ overlay_opacity }};"
+>
+  <div class="editorial-banner__media" data-editorial-banner-media>
+    {% if has_media %}
+      <picture class="editorial-banner__picture">
+        {% if section.settings.mobile_image %}
+          <source
+            media="(max-width: 749px)"
+            srcset="{{ mobile_image | image_url: width: 750 }} 750w, {{ mobile_image | image_url: width: 1500 }} 1500w"
+            sizes="100vw"
+          >
+        {% endif %}
+        <source
+          media="(min-width: 750px)"
+          srcset="{{ desktop_image | image_url: width: 1600 }} 1600w, {{ desktop_image | image_url: width: 2400 }} 2400w, {{ desktop_image | image_url: width: 3200 }} 3200w"
+          sizes="100vw"
+        >
+        <img
+          src="{{ desktop_image | image_url: width: 1600 }}"
+          alt="{{ desktop_image.alt | default: section.settings.headline | escape }}"
+          class="editorial-banner__image"
+          loading="lazy"
+          width="{{ desktop_image.width | default: 1600 }}"
+          height="{{ desktop_image.height | default: 2000 }}"
+        >
+      </picture>
+    {% endif %}
+
+    {% if section.settings.video %}
+      <div class="editorial-banner__video-wrap">
+        {{
+          section.settings.video
+          | video_tag:
+            image: desktop_image,
+            autoplay: true,
+            loop: true,
+            muted: true,
+            controls: false,
+            class: 'editorial-banner__video'
+        }}
+      </div>
+    {% endif %}
+
+    <div class="editorial-banner__overlay"></div>
+  </div>
+
+  <div class="editorial-banner__content">
+    {% if section.settings.headline != blank %}
+      <h2 class="editorial-banner__headline text-display" data-reveal-text>{{ section.settings.headline }}</h2>
+    {% endif %}
+
+    <div class="editorial-banner__body" data-reveal="up">
+      {% if section.settings.description != blank %}
+        <div class="editorial-banner__description text-body-lg" data-reveal-child>{{ section.settings.description }}</div>
+      {% endif %}
+
+      {% if has_any_cta %}
+        <div class="editorial-banner__cta-row" data-reveal-child>
+          {% if has_primary_cta %}
+            {% render 'button', text: section.settings.cta_text, url: section.settings.cta_link, style: 'primary' %}
+          {% endif %}
+          {% if has_secondary_cta %}
+            {% render 'button', text: section.settings.secondary_cta_text, url: section.settings.secondary_cta_link, style: 'text' %}
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .editorial-banner {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    color: var(--color-background);
+  }
+  .editorial-banner[data-height="small"] { min-height: 60svh; }
+  .editorial-banner[data-height="medium"] { min-height: 75svh; }
+  .editorial-banner[data-height="large"] { min-height: 90svh; }
+
+  .editorial-banner[data-align="left"] { align-items: flex-start; }
+  .editorial-banner[data-align="center"] { align-items: center; }
+  .editorial-banner[data-align="right"] { align-items: flex-end; }
+  .editorial-banner[data-valign="top"] { justify-content: flex-start; }
+  .editorial-banner[data-valign="center"] { justify-content: center; }
+  .editorial-banner[data-valign="bottom"] { justify-content: flex-end; }
+
+  .editorial-banner__media {
+    position: absolute;
+    inset: 0;
+    z-index: var(--z-behind);
+  }
+  .editorial-banner__picture,
+  .editorial-banner__image,
+  .editorial-banner__video-wrap,
+  .editorial-banner__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .editorial-banner__video-wrap { display: none; }
+  }
+  .editorial-banner__overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--color-foreground);
+    opacity: var(--editorial-banner-overlay-opacity, 0.3);
+  }
+
+  .editorial-banner__content {
+    position: relative;
+    z-index: var(--z-raised);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    max-width: 34rem;
+    padding: var(--space-section-lg) var(--page-margin);
+  }
+  .editorial-banner[data-align="left"] .editorial-banner__content { text-align: left; align-items: flex-start; }
+  .editorial-banner[data-align="center"] .editorial-banner__content { text-align: center; align-items: center; }
+  .editorial-banner[data-align="right"] .editorial-banner__content { text-align: right; align-items: flex-end; }
+
+  .editorial-banner__headline {
+    color: inherit;
+  }
+  .editorial-banner__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  .editorial-banner[data-align="left"] .editorial-banner__body,
+  .editorial-banner[data-align="center"] .editorial-banner__body,
+  .editorial-banner[data-align="right"] .editorial-banner__body {
+    align-items: inherit;
+  }
+  .editorial-banner__description {
+    color: inherit;
+    opacity: 0.85;
+  }
+  .editorial-banner__cta-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+  }
+
+  /* ---------- Mobile (base) — shorter, bottom-anchored regardless of the
+     configured position: a top- or center-anchored headline over a short
+     mobile viewport crowds the fold in a way it doesn't on a tall desktop
+     screen, so mobile intentionally overrides to the one position that
+     always reads well here. ---------- */
+  @media (max-width: 749px) {
+    .editorial-banner[data-height="large"] { min-height: 80svh; }
+    .editorial-banner {
+      justify-content: flex-end !important;
+      align-items: flex-start !important;
+    }
+    .editorial-banner__content {
+      text-align: left !important;
+      align-items: flex-start !important;
+      max-width: none;
+      padding: var(--space-section-md) var(--page-margin);
+    }
+    .editorial-banner__overlay {
+      background: linear-gradient(0deg, var(--color-foreground) 0%, transparent 50%);
+    }
+  }
+
+  /* ---------- Tablet (750px+) — the configured content position takes
+     over; overlay becomes a flat scrim since text can land anywhere. ---------- */
+  @media (min-width: 750px) {
+    .editorial-banner__content {
+      max-width: 38rem;
+    }
+  }
+
+  /* ---------- Desktop (1200px+) — full designed scale ---------- */
+  @media (min-width: 1200px) {
+    .editorial-banner__content {
+      max-width: 42rem;
+      padding-inline: var(--space-3xl);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.editorial_banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:general.content"
+    },
+    {
+      "type": "text",
+      "id": "headline",
+      "label": "t:labels.headline",
+      "default": "Where Legacy Meets the Modern Maharaja"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "t:labels.description",
+      "default": "<p>A campaign born from the courts of Rajwada, tailored for the grooms of today.</p>"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "t:labels.button_text",
+      "default": "Explore the Campaign"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "t:labels.button_link"
+    },
+    {
+      "type": "text",
+      "id": "secondary_cta_text",
+      "label": "t:labels.secondary_button_text"
+    },
+    {
+      "type": "url",
+      "id": "secondary_cta_link",
+      "label": "t:labels.secondary_button_link"
+    },
+    {
+      "type": "header",
+      "content": "t:general.media"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.image"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "t:labels.mobile_image",
+      "info": "t:info.mobile_image"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "t:labels.video",
+      "info": "t:info.video"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "t:labels.overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "t:general.layout"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "t:labels.height",
+      "options": [
+        { "value": "small", "label": "t:options.height.small" },
+        { "value": "medium", "label": "t:options.height.medium" },
+        { "value": "large", "label": "t:options.height.large" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "content_position",
+      "label": "t:labels.content_position",
+      "options": [
+        { "value": "top_left", "label": "t:options.content_position.top_left" },
+        { "value": "top_center", "label": "t:options.content_position.top_center" },
+        { "value": "top_right", "label": "t:options.content_position.top_right" },
+        { "value": "center_left", "label": "t:options.content_position.center_left" },
+        { "value": "center", "label": "t:options.content_position.center" },
+        { "value": "center_right", "label": "t:options.content_position.center_right" },
+        { "value": "bottom_left", "label": "t:options.content_position.bottom_left" },
+        { "value": "bottom_center", "label": "t:options.content_position.bottom_center" },
+        { "value": "bottom_right", "label": "t:options.content_position.bottom_right" }
+      ],
+      "default": "bottom_left"
+    },
+    {
+      "type": "header",
+      "content": "t:general.motion"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_animations",
+      "label": "t:labels.enable_animations",
+      "info": "t:info.enable_animations",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.editorial_banner"
+    }
+  ]
+}
+{% endschema %}

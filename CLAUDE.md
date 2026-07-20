@@ -1,0 +1,1 @@
+C:/Prtaipalsinh/Legend Rajwada/AGENTS.md

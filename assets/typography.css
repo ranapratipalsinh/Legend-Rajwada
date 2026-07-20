@@ -1,0 +1,145 @@
+/**
+ * Typography system.
+ *
+ * Two families, used on purpose: --font-display (an oldstyle serif, set
+ * loose) carries statement and product-name moments; --font-primary (a
+ * grotesk sans) carries everything read for information. Sizes come from
+ * the static scale in assets/variables.css; families/weights come from the
+ * merchant's font_picker settings, compiled in snippets/css-variables.liquid.
+ *
+ * Every heading element gets a sane default so raw content (e.g. from a
+ * customer's blog post) isn't unstyled, but page authors should reach for
+ * the .text-* classes directly rather than relying on element defaults.
+ */
+
+body {
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display--family);
+  font-style: var(--font-display--style);
+  line-height: var(--line-height-heading);
+  letter-spacing: var(--tracking-tight);
+}
+
+h1 { font-size: var(--font-size-h1); }
+h2 { font-size: var(--font-size-h2); }
+h3 { font-size: var(--font-size-h3); }
+h4 { font-size: var(--font-size-h4); }
+h5 { font-size: var(--font-size-h5); }
+h6 { font-size: var(--font-size-h6); }
+
+.text-display {
+  font-family: var(--font-display--family);
+  font-style: var(--font-display--style);
+  font-size: var(--font-size-display);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--tracking-tight);
+}
+
+.text-h1 { font-size: var(--font-size-h1); }
+.text-h2 { font-size: var(--font-size-h2); }
+.text-h3 { font-size: var(--font-size-h3); }
+.text-h4 { font-size: var(--font-size-h4); }
+.text-h5 { font-size: var(--font-size-h5); }
+.text-h6 { font-size: var(--font-size-h6); }
+.text-h1, .text-h2, .text-h3, .text-h4, .text-h5, .text-h6 {
+  font-family: var(--font-display--family);
+  font-style: var(--font-display--style);
+  line-height: var(--line-height-heading);
+  letter-spacing: var(--tracking-tight);
+}
+
+.text-subtitle {
+  font-family: var(--font-display--family);
+  font-style: italic;
+  font-size: var(--font-size-body-lg);
+  color: var(--color-foreground-soft);
+}
+
+.text-body {
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+
+.text-body-lg {
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-body-lg);
+  line-height: var(--line-height-body);
+}
+
+.text-caption {
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-caption);
+  color: var(--color-foreground-soft);
+}
+
+/* Shared "eyebrow" treatment: tracked uppercase labels used by badges, form
+   labels, breadcrumbs and nav — one rule, referenced everywhere so the
+   tracking value only ever lives in one place. */
+.text-eyebrow {
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+}
+
+.text-nav {
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-small);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.text-button-label {
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-small);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.text-product-title {
+  font-family: var(--font-display--family);
+  font-style: var(--font-display--style);
+  font-size: var(--font-size-body-lg);
+  line-height: var(--line-height-heading);
+}
+
+.text-product-price {
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-body);
+  font-variant-numeric: tabular-nums;
+}
+
+.text-product-price s {
+  color: var(--color-foreground-soft);
+  margin-inline-end: var(--space-2xs);
+  text-decoration-thickness: 1px;
+}
+
+.text-collection-title {
+  font-family: var(--font-display--family);
+  font-style: var(--font-display--style);
+  font-size: var(--font-size-h4);
+  line-height: var(--line-height-heading);
+}
+
+.text-form-label {
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-foreground-soft);
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-balance { text-wrap: balance; }
+.text-pretty { text-wrap: pretty; }

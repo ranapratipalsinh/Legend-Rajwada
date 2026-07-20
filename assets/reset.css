@@ -1,0 +1,100 @@
+/**
+ * Global foundation reset.
+ *
+ * assets/critical.css already carries the render-blocking subset (box model,
+ * body shell, media defaults, form font inheritance, heading/paragraph
+ * spacing). This file is the non-blocking remainder: everything a browser's
+ * user-agent stylesheet still imposes that this theme never wants.
+ *
+ * Loaded once, globally, after critical.css.
+ */
+
+html {
+  /* Lenis (assets/scroll.js) drives smooth scrolling when enabled; the
+     native behaviour must stay 'auto' or the two fight each other. */
+  scroll-behavior: auto;
+  hanging-punctuation: first last;
+}
+
+ul[class],
+ol[class] {
+  list-style: none;
+  padding: 0;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+button,
+input,
+optgroup,
+select {
+  background: none;
+  border: 0;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  text-align: inherit;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+legend {
+  padding: 0;
+}
+
+textarea {
+  resize: vertical;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--color-line);
+  margin: 0;
+}
+
+audio,
+video {
+  max-width: 100%;
+}
+
+::-webkit-details-marker {
+  display: none;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* The last, absolute line of defence for motion. Component-level opt-outs
+   live in assets/animations.css and assets/motion-preference.js; this rule
+   guarantees a static experience even if either of those fail to load. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

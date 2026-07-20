@@ -1,0 +1,68 @@
+{% doc %}
+  Renders the ancestry trail for the current page (collection, product,
+  blog, article, page). Resolves the trail from Shopify's own page objects
+  rather than taking parameters, since the ancestry is never something a
+  caller chooses — it's a fact about where the current request landed.
+
+  Renders nothing on page types with no meaningful ancestry (home, cart,
+  search, 404).
+
+  @example
+  {% render 'breadcrumb' %}
+{% enddoc %}
+
+{% liquid
+  assign show = true
+  case request.page_type
+    when 'index', 'cart', 'search', '404', 'password'
+      assign show = false
+  endcase
+%}
+
+{% if show %}
+  <nav class="breadcrumb-nav" aria-label="{{ 'general.breadcrumb.label' | t }}">
+    <ol class="breadcrumb">
+      <li>
+        <a href="{{ routes.root_url }}">{{ 'general.breadcrumb.home' | t }}</a>
+      </li>
+      <li class="breadcrumb__sep" aria-hidden="true">&mdash;</li>
+
+      {% case request.page_type %}
+        {% when 'collection' %}
+          <li>
+            <span class="breadcrumb__current" aria-current="page">{{ collection.title }}</span>
+          </li>
+
+        {% when 'product' %}
+          {% if collection %}
+            <li>
+              <a href="{{ collection.url }}">{{ collection.title }}</a>
+            </li>
+            <li class="breadcrumb__sep" aria-hidden="true">&mdash;</li>
+          {% endif %}
+          <li>
+            <span class="breadcrumb__current" aria-current="page">{{ product.title }}</span>
+          </li>
+
+        {% when 'page' %}
+          <li>
+            <span class="breadcrumb__current" aria-current="page">{{ page.title }}</span>
+          </li>
+
+        {% when 'blog' %}
+          <li>
+            <span class="breadcrumb__current" aria-current="page">{{ blog.title }}</span>
+          </li>
+
+        {% when 'article' %}
+          <li>
+            <a href="{{ blog.url }}">{{ blog.title }}</a>
+          </li>
+          <li class="breadcrumb__sep" aria-hidden="true">&mdash;</li>
+          <li>
+            <span class="breadcrumb__current" aria-current="page">{{ article.title }}</span>
+          </li>
+      {% endcase %}
+    </ol>
+  </nav>
+{% endif %}

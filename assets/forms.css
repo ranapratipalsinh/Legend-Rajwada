@@ -1,0 +1,136 @@
+/**
+ * Form system.
+ *
+ * Underline fields are the primary style — transparent background, a
+ * hairline bottom border that thickens to the accent colour on focus. No
+ * boxed inputs, no fills; the intent is that a form reads as part of the
+ * page, not as a foreign widget dropped onto it.
+ */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.field__label {
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-foreground-soft);
+}
+
+.field__input,
+.field__textarea,
+.field__select {
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-body);
+  color: var(--color-foreground);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-line);
+  border-radius: 0;
+  padding-block: var(--space-2xs);
+  transition: border-color var(--duration-fast) var(--ease-signature);
+}
+
+.field__textarea {
+  border: 1px solid var(--color-line);
+  border-radius: var(--style-border-radius-inputs, var(--radius-md));
+  padding: var(--space-sm);
+  min-height: 8rem;
+}
+
+.field__input::placeholder,
+.field__textarea::placeholder {
+  color: var(--color-foreground-soft);
+  opacity: 1;
+}
+
+.field__input:focus,
+.field__textarea:focus,
+.field__select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.field__select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 1rem) center, calc(100% - 0.6rem) center;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-inline-end: var(--space-lg);
+}
+
+/* ---------- Checkbox / radio ---------- */
+.field__check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--font-size-body);
+  cursor: pointer;
+}
+
+.field__check input[type="checkbox"],
+.field__check input[type="radio"] {
+  appearance: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+  border: 1px solid var(--color-line);
+  background: var(--color-background);
+  transition: border-color var(--duration-fast) var(--ease-signature), background-color var(--duration-fast) var(--ease-signature);
+}
+
+.field__check input[type="checkbox"] {
+  border-radius: var(--radius-sm);
+}
+.field__check input[type="radio"] {
+  border-radius: var(--radius-pill);
+}
+
+.field__check input:checked {
+  background-color: var(--color-foreground);
+  border-color: var(--color-foreground);
+}
+
+.field__check input[type="checkbox"]:checked {
+  background-image: linear-gradient(45deg, transparent 40%, var(--color-background) 40%, var(--color-background) 55%, transparent 55%),
+    linear-gradient(135deg, transparent 45%, var(--color-background) 45%, var(--color-background) 60%, transparent 60%);
+}
+
+.field__check input[type="radio"]:checked {
+  box-shadow: inset 0 0 0 3px var(--color-background);
+}
+
+.field__check input:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* ---------- Validation states ---------- */
+.field--error .field__label {
+  color: var(--color-signal-error);
+}
+.field--error .field__input,
+.field--error .field__textarea,
+.field--error .field__select {
+  border-color: var(--color-signal-error);
+}
+
+.field__message {
+  font-size: var(--font-size-caption);
+}
+.field__message--error {
+  color: var(--color-signal-error);
+}
+.field__message--success {
+  color: var(--color-signal-success);
+}
+
+[aria-invalid="true"] {
+  border-color: var(--color-signal-error) !important;
+}

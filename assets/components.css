@@ -1,0 +1,282 @@
+/**
+ * Shared component primitives.
+ *
+ * Generic building blocks reused by many future sections — badges, a card
+ * shell, a divider. Nothing product- or page-specific lives here; a
+ * product card, header nav, or homepage hero is a section's own concern
+ * and stays out of the global foundation.
+ */
+
+/* ---------- Skip link ---------- */
+.skip-link {
+  position: absolute;
+  top: -3rem;
+  left: var(--space-sm);
+  z-index: var(--z-toast);
+  background: var(--color-foreground);
+  color: var(--color-background);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-sm);
+  transition: top var(--duration-fast) var(--ease-signature);
+}
+.skip-link:focus {
+  top: var(--space-sm);
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* ---------- Badge / tag ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  border-radius: var(--radius-pill);
+  padding-inline: var(--space-sm);
+  padding-block: var(--space-3xs);
+  border: 1px solid var(--color-line);
+  color: var(--color-foreground);
+}
+
+.badge--muted {
+  color: var(--color-foreground-soft);
+}
+
+.badge--accent {
+  background-color: var(--color-accent-soft);
+  border-color: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.badge--sale {
+  background-color: var(--color-signal-error);
+  border-color: var(--color-signal-error);
+  color: var(--color-background);
+}
+
+/* ---------- Divider ---------- */
+.divider {
+  border: none;
+  border-top: 1px solid var(--color-line);
+  margin: 0;
+}
+
+/* ---------- Generic card shell ----------
+   A layout contract only — image slot, then a flow of body content. Any
+   future product/collection/article card composes on top of this rather
+   than restating the spacing relationship. */
+.card {
+  display: flex;
+  flex-direction: column;
+}
+.card__media {
+  border-radius: var(--radius-md);
+  position: relative;
+  overflow: hidden;
+}
+.card__body {
+  padding-top: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+/* ---------- Breadcrumb ---------- */
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-size: var(--font-size-small);
+  color: var(--color-foreground-soft);
+}
+.breadcrumb a:hover { color: var(--color-accent); }
+.breadcrumb__current { color: var(--color-foreground); }
+.breadcrumb__sep { color: var(--color-line); }
+
+/* ---------- Pagination ---------- */
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  font-size: var(--font-size-small);
+}
+.pagination a {
+  color: var(--color-foreground-soft);
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: color var(--duration-fast) var(--ease-signature), border-color var(--duration-fast) var(--ease-signature);
+}
+.pagination a:hover {
+  color: var(--color-accent);
+}
+.pagination a[aria-current="page"] {
+  color: var(--color-foreground);
+  border-color: var(--color-accent);
+}
+
+/* ---------- Spinner ---------- */
+.spinner {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--color-line);
+  border-top-color: var(--color-foreground);
+  border-radius: var(--radius-pill);
+  animation: spin var(--duration-slow) linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation-duration: 1.5s; }
+}
+
+/* ---------- Dialog mechanics ----------
+   Shared shell for every drawer/modal instance (menu, cart, quick view,
+   search, and any future generic modal) — see snippets/theme-overlays.liquid
+   and assets/component-dialog.js. Positioning and open/close motion only;
+   each instance's content is that feature's own concern. */
+.drawer,
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+}
+
+.modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+}
+
+.drawer__backdrop,
+.modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 19, 17, 0.4);
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-out-soft);
+}
+.drawer:not([hidden]) .drawer__backdrop,
+.modal:not([hidden]) .modal__backdrop {
+  opacity: 1;
+}
+
+.drawer__panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(26rem, 100%);
+  background: var(--color-background);
+  box-shadow: var(--shadow-lg);
+  transform: translateX(100%);
+  transition: transform var(--duration-base) var(--ease-out-soft);
+  display: flex;
+  flex-direction: column;
+}
+.drawer:not([hidden]) .drawer__panel {
+  transform: translateX(0);
+}
+
+.modal__panel {
+  position: relative;
+  max-width: 32rem;
+  width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  background: var(--color-background);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-md);
+  opacity: 0;
+  transform: translateY(1rem) scale(0.98);
+  transition: opacity var(--duration-base) var(--ease-out-soft), transform var(--duration-base) var(--ease-out-soft);
+  display: flex;
+  flex-direction: column;
+}
+.modal:not([hidden]) .modal__panel {
+  opacity: 1;
+  transform: none;
+}
+
+.drawer__header,
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--color-line);
+}
+.drawer__body,
+.modal__body {
+  padding: var(--space-md);
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Applied to <html> by assets/component-dialog.js while any dialog is open. */
+html.is-locked {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer__panel,
+  .modal__panel,
+  .drawer__backdrop,
+  .modal__backdrop {
+    transition-duration: 1ms;
+  }
+}
+
+/* ---------- Back to top ---------- */
+.back-to-top {
+  position: fixed;
+  right: var(--space-lg);
+  bottom: var(--space-lg);
+  z-index: var(--z-sticky);
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-foreground);
+  color: var(--color-background);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(0.5rem);
+  pointer-events: none;
+  transition: opacity var(--duration-fast) var(--ease-signature), transform var(--duration-fast) var(--ease-signature), background-color var(--duration-fast) var(--ease-signature);
+}
+.back-to-top.is-visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.back-to-top:hover {
+  background: var(--color-accent);
+}
+
+/* ---------- Search affordance ---------- */
+.search-field {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  padding-inline: var(--space-md);
+  padding-block: var(--space-2xs);
+  transition: border-color var(--duration-fast) var(--ease-signature);
+}
+.search-field:focus-within {
+  border-color: var(--color-accent);
+}
+.search-field input {
+  border: none;
+  background: none;
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-small);
+  color: var(--color-foreground);
+}
+.search-field input:focus { outline: none; }

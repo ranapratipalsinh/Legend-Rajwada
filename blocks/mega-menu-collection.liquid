@@ -1,0 +1,32 @@
+{% doc %}
+  Defines the settings surface for a "featured collection" mega menu
+  attachment. This file's body is intentionally not rendered: Liquid's
+  `content_for 'block'` requires a literal id/type known at author time,
+  which doesn't fit "render whichever blocks match this menu item at
+  runtime" — so snippets/mega-menu.liquid reads `block.settings` and
+  `block.type` directly instead. This file exists to own the
+  `{% schema %}` below, since a block type can't exist in the theme
+  editor without one.
+
+  @example
+  Not rendered directly — see snippets/mega-menu.liquid.
+{% enddoc %}
+
+{% schema %}
+{
+  "name": "t:general.mega_menu",
+  "settings": [
+    {
+      "type": "text",
+      "id": "menu_item_title",
+      "label": "t:labels.menu_item_title",
+      "info": "t:info.menu_item_title"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:labels.collection"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,92 @@
+/**
+ * Layout primitives.
+ *
+ * assets/critical.css already defines the page-level grid (.shopify-section,
+ * .full-width) that every section renders into — that stays untouched here.
+ * This file adds the primitives sections and snippets compose with *inside*
+ * that grid: constrained reading widths, a 12-column grid, a small flex
+ * utility set, section vertical rhythm, and image aspect ratios.
+ */
+
+/* ---------- Constrained content widths ---------- */
+.container-article {
+  max-width: var(--container-article);
+  margin-inline: auto;
+}
+
+.container-narrow {
+  max-width: var(--container-narrow);
+  margin-inline: auto;
+}
+
+/* ---------- 12-column grid ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--space-md);
+}
+
+@media (max-width: 749px) {
+  .grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (min-width: 750px) and (max-width: 989px) {
+  .grid { grid-template-columns: repeat(8, 1fr); }
+}
+
+.grid[data-gap="sm"] { gap: var(--space-sm); }
+.grid[data-gap="lg"] { gap: var(--space-lg); }
+
+/* ---------- Flex utilities ---------- */
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+.items-start { align-items: flex-start; }
+.items-center { align-items: center; }
+.items-end { align-items: flex-end; }
+.justify-start { justify-content: flex-start; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-end { justify-content: flex-end; }
+
+.gap-3xs { gap: var(--space-3xs); }
+.gap-2xs { gap: var(--space-2xs); }
+.gap-xs  { gap: var(--space-xs); }
+.gap-sm  { gap: var(--space-sm); }
+.gap-md  { gap: var(--space-md); }
+.gap-lg  { gap: var(--space-lg); }
+.gap-xl  { gap: var(--space-xl); }
+
+/* ---------- Vertical rhythm ----------
+   Spaces direct-child siblings without margin-collapse surprises. Apply to
+   any wrapper whose children should read as a stack of related content
+   (a card body, a form, a text block) rather than laying it out with
+   individual top/bottom margins per element. */
+.flow > * + * {
+  margin-block-start: var(--flow-space, var(--space-md));
+}
+
+/* ---------- Section vertical rhythm ---------- */
+.section-padding {
+  padding-block: var(--space-section-md);
+}
+.section-padding--sm { padding-block: var(--space-section-sm); }
+.section-padding--lg { padding-block: var(--space-section-lg); }
+
+/* ---------- Image aspect ratios ----------
+   Paired with the aspect-ratio property (not a padding-hack) so the browser
+   reserves the box before the image decodes — no layout shift. */
+.ratio-square         { aspect-ratio: var(--ratio-square); }
+.ratio-portrait        { aspect-ratio: var(--ratio-portrait); }
+.ratio-portrait-tall   { aspect-ratio: var(--ratio-portrait-tall); }
+.ratio-landscape       { aspect-ratio: var(--ratio-landscape); }
+.ratio-landscape-wide  { aspect-ratio: var(--ratio-landscape-wide); }
+
+.ratio-square img,
+.ratio-portrait img,
+.ratio-portrait-tall img,
+.ratio-landscape img,
+.ratio-landscape-wide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

@@ -1,0 +1,116 @@
+/**
+ * Button system.
+ *
+ * Two weighted variants (primary, secondary) plus a borderless text link —
+ * deliberately no third "bright" variant. Restraint is enforced by only
+ * having these three to choose from. All three share sizing, radius and
+ * motion so a merchant switching variants never sees a layout jump.
+ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-small);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  line-height: 1;
+  min-height: 2.75rem; /* accessible tap target */
+  padding-inline: var(--space-lg);
+  border-radius: var(--style-border-radius-inputs, var(--radius-sm));
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-signature),
+    border-color var(--duration-fast) var(--ease-signature),
+    color var(--duration-fast) var(--ease-signature),
+    opacity var(--duration-fast) var(--ease-signature);
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.btn--primary {
+  background-color: var(--color-foreground);
+  border-color: var(--color-foreground);
+  color: var(--color-background);
+}
+.btn--primary:hover {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.btn--secondary {
+  background-color: transparent;
+  border-color: var(--color-foreground);
+  color: var(--color-foreground);
+}
+.btn--secondary:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.btn--text {
+  min-height: auto;
+  padding-inline: 0;
+  border: none;
+  background: none;
+  color: var(--color-foreground);
+  background-image: linear-gradient(var(--color-accent), var(--color-accent));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  border-radius: 0;
+  transition: background-size var(--duration-base) var(--ease-out-soft), color var(--duration-fast) var(--ease-signature);
+}
+.btn--text:hover {
+  background-size: 100% 1px;
+  color: var(--color-accent);
+}
+
+.btn--icon {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  padding-inline: 0;
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+  background-image: none;
+}
+
+/* Loading state: label is kept in the DOM for screen readers but visually
+   swapped for a spinner. Toggle by adding [data-loading] from JS — no
+   class needed on the label itself. */
+.btn[data-loading] {
+  position: relative;
+  color: transparent;
+  pointer-events: none;
+}
+.btn[data-loading]::after {
+  content: "";
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: var(--radius-pill);
+  color: var(--color-background);
+  /* @keyframes spin lives in assets/animations.css, shared with the
+     standalone .spinner in assets/components.css. */
+  animation: spin var(--duration-slow) linear infinite;
+}
+.btn--secondary[data-loading]::after,
+.btn--text[data-loading]::after {
+  color: var(--color-foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn[data-loading]::after { animation-duration: 1.5s; }
+}

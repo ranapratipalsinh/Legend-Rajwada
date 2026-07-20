@@ -1,0 +1,367 @@
+{% comment %}
+  Brand Story — an asymmetric editorial split (image + content) with a
+  layered pull-quote, echoing Hero's asymmetrical treatment so the two
+  sections read as chapters of one story rather than two unrelated
+  templates. See the Homepage Architecture notes for this section's role
+  in the customer journey: establish trust before the collection showcase.
+{% endcomment %}
+
+{% liquid
+  assign desktop_image = section.settings.image
+  assign mobile_image = section.settings.mobile_image | default: section.settings.image
+  assign animations_enabled = section.settings.enable_animations
+  assign overlay_opacity = section.settings.overlay_opacity | default: 15 | times: 1.0 | divided_by: 100.0
+%}
+
+<section
+  class="brand-story brand-story--image-{{ section.settings.image_position }}"
+  data-component="brand-story"
+  data-animations="{{ animations_enabled }}"
+  style="
+    --brand-story-spacing: var(--space-section-{{ section.settings.spacing }});
+    --brand-story-overlay-opacity: {{ overlay_opacity }};
+    {%- if section.settings.background_color %}--brand-story-background: {{ section.settings.background_color }};{% endif %}
+  "
+>
+  <div class="brand-story__media">
+    {% if desktop_image %}
+      <div class="brand-story__image-wrap" data-brand-story-image>
+        <picture class="brand-story__picture">
+          {% if section.settings.mobile_image %}
+            <source
+              media="(max-width: 749px)"
+              srcset="{{ mobile_image | image_url: width: 750 }} 750w, {{ mobile_image | image_url: width: 1500 }} 1500w"
+              sizes="100vw"
+            >
+          {% endif %}
+          <source
+            media="(min-width: 750px)"
+            srcset="{{ desktop_image | image_url: width: 1400 }} 1400w, {{ desktop_image | image_url: width: 2200 }} 2200w"
+            sizes="(min-width: 990px) 55vw, 100vw"
+          >
+          <img
+            src="{{ desktop_image | image_url: width: 1400 }}"
+            alt="{{ desktop_image.alt | default: section.settings.heading | escape }}"
+            class="brand-story__image"
+            loading="lazy"
+            width="{{ desktop_image.width | default: 1400 }}"
+            height="{{ desktop_image.height | default: 1750 }}"
+          >
+        </picture>
+        <div class="brand-story__overlay"></div>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="brand-story__content">
+    <span class="brand-story__ornament" aria-hidden="true"></span>
+
+    {% if section.settings.heading != blank %}
+      <h2 class="brand-story__heading text-display" data-reveal-text>{{ section.settings.heading }}</h2>
+    {% endif %}
+
+    <div class="brand-story__body" data-reveal="up">
+      {% if section.settings.subheading != blank %}
+        <p class="brand-story__subheading text-body-lg" data-reveal-child>{{ section.settings.subheading }}</p>
+      {% endif %}
+
+      {% if section.settings.story != blank %}
+        <div class="brand-story__story text-body" data-reveal-child>{{ section.settings.story }}</div>
+      {% endif %}
+
+      {% if section.settings.quote != blank %}
+        <blockquote class="brand-story__quote" data-reveal-child>
+          <span class="brand-story__quote-mark" aria-hidden="true">&#8220;</span>
+          {{ section.settings.quote }}
+        </blockquote>
+      {% endif %}
+
+      {% if section.settings.button_text != blank and section.settings.button_link != blank %}
+        <div class="brand-story__cta" data-reveal-child>
+          {% render 'button', text: section.settings.button_text, url: section.settings.button_link, style: 'secondary' %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .brand-story {
+    position: relative;
+    background-color: var(--brand-story-background, var(--color-background));
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---------- Media ---------- */
+  .brand-story__media {
+    width: 100%;
+  }
+  .brand-story__image-wrap {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: var(--ratio-portrait);
+  }
+  .brand-story__picture,
+  .brand-story__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .brand-story__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, var(--color-foreground) 0%, transparent 40%);
+    opacity: var(--brand-story-overlay-opacity, 0.15);
+    pointer-events: none;
+  }
+
+  /* ---------- Content ---------- */
+  .brand-story__content {
+    padding: var(--brand-story-spacing, var(--space-section-md)) var(--page-margin);
+    display: flex;
+    flex-direction: column;
+  }
+  .brand-story__ornament {
+    display: block;
+    position: relative;
+    width: 3rem;
+    height: 1px;
+    background: var(--color-accent);
+    margin-bottom: var(--space-md);
+  }
+  .brand-story__ornament::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    transform: translate(-50%, -50%);
+  }
+  .brand-story__heading {
+    max-width: 20ch;
+    margin-bottom: var(--space-lg);
+  }
+  .brand-story__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    max-width: 34rem;
+  }
+  .brand-story__subheading {
+    color: var(--color-foreground-soft);
+  }
+  .brand-story__story {
+    color: var(--color-foreground);
+  }
+  .brand-story__story p + p {
+    margin-top: var(--space-sm);
+  }
+  .brand-story__quote {
+    position: relative;
+    margin: var(--space-sm) 0 0;
+    padding-top: var(--space-md);
+    font-family: var(--font-display--family);
+    font-style: italic;
+    font-size: var(--font-size-h5);
+    line-height: var(--line-height-heading);
+    max-width: 28ch;
+  }
+  .brand-story__quote-mark {
+    position: absolute;
+    top: -0.75rem;
+    left: -0.15em;
+    font-size: 4rem;
+    font-style: normal;
+    color: var(--color-accent-soft);
+    line-height: 1;
+    z-index: -1;
+  }
+  .brand-story__cta {
+    margin-top: var(--space-sm);
+  }
+
+  /* ---------- Mobile / tablet (base through 989px) — a clean stacked
+     magazine page: image first, full width, content below in normal flow.
+     The split is a laptop-and-up composition; squeezing it into a tablet
+     column would cramp the story copy this section depends on. ---------- */
+  @media (max-width: 749px) {
+    .brand-story__image-wrap {
+      aspect-ratio: 4 / 5;
+    }
+    .brand-story__heading {
+      max-width: none;
+    }
+    .brand-story__quote {
+      font-size: var(--font-size-h6);
+    }
+  }
+
+  /* ---------- Laptop (990px+) — the asymmetric split activates ---------- */
+  @media (min-width: 990px) {
+    .brand-story {
+      flex-direction: row;
+      align-items: stretch;
+    }
+    .brand-story__media {
+      width: 55%;
+      flex-shrink: 0;
+    }
+    .brand-story__image-wrap {
+      height: 100%;
+      aspect-ratio: auto;
+    }
+    .brand-story__content {
+      width: 45%;
+      justify-content: center;
+      padding-inline: var(--space-2xl);
+    }
+    .brand-story--image-right .brand-story__media {
+      order: 2;
+    }
+    .brand-story--image-right .brand-story__content {
+      order: 1;
+    }
+  }
+
+  /* ---------- Desktop (1200px+) — full designed scale ---------- */
+  @media (min-width: 1200px) {
+    .brand-story__media {
+      width: 60%;
+    }
+    .brand-story__content {
+      width: 40%;
+      padding-inline: var(--space-3xl);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .brand-story__image-wrap {
+      overflow: visible;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.brand_story",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:general.content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.headline",
+      "default": "Heirs to the Rajwada"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheadline",
+      "default": "Est. in the tradition of royal Indian tailoring"
+    },
+    {
+      "type": "richtext",
+      "id": "story",
+      "label": "t:labels.story",
+      "default": "<p>Every Rajwada once kept its own master tailors — the hands entrusted with dressing kings for their most defining days. Legend Rajwada carries that lineage forward, translating centuries of court craftsmanship into sherwanis and Indo-Western couture for the modern groom.</p><p>Each piece is hand-finished in our atelier, built to be worn once and remembered always.</p>"
+    },
+    {
+      "type": "text",
+      "id": "quote",
+      "label": "t:labels.quote",
+      "default": "A sherwani is not stitched. It is inherited."
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "t:labels.button_text",
+      "default": "Our Heritage"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "t:labels.button_link"
+    },
+    {
+      "type": "header",
+      "content": "t:general.media"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.image"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "t:labels.mobile_image",
+      "info": "t:info.mobile_image"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "t:labels.overlay_opacity",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "%",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "t:general.layout"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "t:labels.image_position",
+      "info": "t:info.image_position",
+      "options": [
+        { "value": "left", "label": "t:options.alignment.left" },
+        { "value": "right", "label": "t:options.alignment.right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "spacing",
+      "label": "t:labels.padding",
+      "options": [
+        { "value": "sm", "label": "t:options.size.small" },
+        { "value": "md", "label": "t:options.size.medium" },
+        { "value": "lg", "label": "t:options.size.large" }
+      ],
+      "default": "md"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "t:labels.header_background"
+    },
+    {
+      "type": "header",
+      "content": "t:general.motion"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_animations",
+      "label": "t:labels.enable_animations",
+      "info": "t:info.enable_animations",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.brand_story"
+    }
+  ]
+}
+{% endschema %}

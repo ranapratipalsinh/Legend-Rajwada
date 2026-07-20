@@ -1,0 +1,38 @@
+{% style %}
+  {% # Loads all font variantions with display: swap %}
+  {{ settings.type_primary_font | font_face: font_display: 'swap' }}
+  {{ settings.type_primary_font | font_modify: 'weight', 'bold' | font_face: font_display: 'swap' }}
+  {{ settings.type_primary_font | font_modify: 'weight', 'bold' | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}
+  {{ settings.type_primary_font | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}
+  {{ settings.type_display_font | font_face: font_display: 'swap' }}
+  {{ settings.type_display_font | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}
+
+  :root {
+    {%- comment %} Typography — merchant-controlled via font_picker {% endcomment %}
+    --font-primary--family: {{ settings.type_primary_font.family }}, {{ settings.type_primary_font.fallback_families }};
+    --font-primary--style: {{ settings.type_primary_font.style }};
+    --font-primary--weight: {{ settings.type_primary_font.weight }};
+    --font-display--family: {{ settings.type_display_font.family }}, {{ settings.type_display_font.fallback_families }};
+    --font-display--style: {{ settings.type_display_font.style }};
+    --font-display--weight: {{ settings.type_display_font.weight }};
+
+    {%- comment %} Layout — merchant-controlled {% endcomment %}
+    --page-width: {{ settings.max_page_width }};
+    --page-margin: {{ settings.min_page_margin }}px;
+    --space-scale: {{ settings.spacing_scale | times: 1.0 | divided_by: 100.0 }};
+
+    {%- comment %} Colour — merchant-controlled. Static shadow/motion tokens live in variables.css. {% endcomment %}
+    --color-background: {{ settings.background_color }};
+    --color-surface: {{ settings.surface_color }};
+    --color-foreground: {{ settings.foreground_color }};
+    --color-foreground-soft: {{ settings.foreground_color_soft }};
+    --color-line: {{ settings.line_color }};
+    --color-accent: {{ settings.accent_color }};
+    --color-accent-soft: {{ settings.accent_color_soft }};
+    --color-signal-error: {{ settings.signal_error_color }};
+    --color-signal-success: {{ settings.signal_success_color }};
+
+    {%- comment %} Controls — merchant-controlled, shared by inputs and buttons {% endcomment %}
+    --style-border-radius-inputs: {{ settings.input_corner_radius }}px;
+  }
+{% endstyle %}

@@ -1,0 +1,56 @@
+{% doc %}
+  Renders a button in one of the theme's three variants. Renders an <a>
+  when `url` is given, a <button> otherwise — the caller never has to
+  choose the element itself.
+
+  @param {string} [text] - The visible label
+  @param {string} [url] - Destination URL. Renders an <a> instead of a <button> when present
+  @param {string} [style] - 'primary' (default), 'secondary', or 'text'
+  @param {string} [icon] - An optional icon name (see snippets/icon.liquid), shown before the label
+  @param {string} [type] - Native button type when no url is given: 'button' (default) or 'submit'
+  @param {boolean} [disabled] - Disables the control
+  @param {boolean} [loading] - Shows the loading spinner state and disables interaction
+  @param {string} [class] - Additional classes
+
+  @example
+  {% render 'button', text: 'Add to bag', style: 'primary', type: 'submit' %}
+  {% render 'button', text: 'View details', url: product.url, style: 'secondary' %}
+  {% render 'button', text: 'Discover the collection', url: collection.url, style: 'text' %}
+{% enddoc %}
+
+{% liquid
+  assign style = style | default: 'primary'
+  assign button_class = 'btn btn--' | append: style
+  if class
+    assign button_class = button_class | append: ' ' | append: class
+  endif
+%}
+
+{% if url %}
+  <a
+    href="{{ url }}"
+    class="{{ button_class }}"
+    {% if disabled %}
+      aria-disabled="true"
+      tabindex="-1"
+    {% endif %}
+  >
+    {% if icon %}{% render 'icon', name: icon %}{% endif %}
+    {{ text }}
+  </a>
+{% else %}
+  <button
+    type="{{ type | default: 'button' }}"
+    class="{{ button_class }}"
+    {% if disabled %}
+      disabled
+    {% endif %}
+    {% if loading %}
+      data-loading
+      aria-busy="true"
+    {% endif %}
+  >
+    {% if icon %}{% render 'icon', name: icon %}{% endif %}
+    {{ text }}
+  </button>
+{% endif %}

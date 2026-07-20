@@ -1,0 +1,30 @@
+{% doc %}
+  Renders an inline SVG icon from assets/icon-{name}.svg. Inlining (rather
+  than an <img>) means the icon inherits `currentColor` and costs no extra
+  HTTP request.
+
+  @param {string} name - The icon name, matching an assets/icon-{name}.svg file
+  @param {number} [size] - The icon's width and height, in pixels. Defaults to 24.
+  @param {string} [class] - Optional class added to the wrapping element
+
+  @example
+  {% render 'icon', name: 'close' %}
+  {% render 'icon', name: 'search', size: 20, class: 'search-field__icon' %}
+{% enddoc %}
+
+<span class="icon icon--{{ name }} {{ class }}" style="--icon-size: {{ size | default: 24 }}px" aria-hidden="true">
+  {{ 'icon-' | append: name | append: '.svg' | inline_asset_content }}
+</span>
+
+{% stylesheet %}
+  .icon {
+    display: inline-flex;
+    width: var(--icon-size, 24px);
+    height: var(--icon-size, 24px);
+    flex-shrink: 0;
+  }
+  .icon svg {
+    width: 100%;
+    height: 100%;
+  }
+{% endstylesheet %}

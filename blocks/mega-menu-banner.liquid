@@ -1,0 +1,48 @@
+{% doc %}
+  Defines the settings surface for a promotional-banner mega menu
+  attachment. Not rendered directly — see blocks/mega-menu-collection.liquid's
+  doc comment for why, and snippets/mega-menu.liquid for where its
+  settings are actually consumed.
+
+  @example
+  Not rendered directly — see snippets/mega-menu.liquid.
+{% enddoc %}
+
+{% schema %}
+{
+  "name": "t:general.mega_menu",
+  "settings": [
+    {
+      "type": "text",
+      "id": "menu_item_title",
+      "label": "t:labels.menu_item_title",
+      "info": "t:info.menu_item_title"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.heading"
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "t:labels.text"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:labels.button_label"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "t:labels.button_url"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,450 @@
+{% comment %}
+  Signature Collection — a stacked sequence of full-bleed campaign panels,
+  one per collection, each presented as its own editorial moment rather
+  than a grid of product-card lookalikes. Every panel is a "collection-panel"
+  block, so merchants add, remove, and reorder collections the same way
+  they would any other block — the "no ecommerce grid" instruction shaped
+  the visual language, not the underlying Shopify architecture.
+{% endcomment %}
+
+{% liquid
+  assign animations_enabled = section.settings.enable_animations
+%}
+
+<section
+  class="signature-collection"
+  data-component="signature-collection"
+  data-animations="{{ animations_enabled }}"
+  style="
+    --signature-collection-spacing: var(--space-section-{{ section.settings.spacing }});
+    {%- if section.settings.background_color %}--signature-collection-background: {{ section.settings.background_color }};{% endif %}
+  "
+>
+  {% if section.settings.eyebrow != blank or section.settings.heading != blank %}
+    <header class="signature-collection__intro">
+      {% if section.settings.eyebrow != blank %}
+        <p class="text-eyebrow" data-reveal="up">{{ section.settings.eyebrow }}</p>
+      {% endif %}
+      {% if section.settings.heading != blank %}
+        <h2 class="signature-collection__intro-heading text-display" data-reveal-text>{{ section.settings.heading }}</h2>
+      {% endif %}
+    </header>
+  {% endif %}
+
+  <div class="signature-collection__panels">
+    {% for block in section.blocks %}
+      {% if block.type == 'collection-panel' %}
+        {% liquid
+          assign collection = block.settings.collection
+          assign panel_image = block.settings.image | default: collection.featured_image
+          assign panel_mobile_image = block.settings.mobile_image | default: panel_image
+          assign panel_heading = block.settings.heading
+          if panel_heading == blank
+            assign panel_heading = collection.title
+          endif
+          assign panel_description = block.settings.description
+          if panel_description == blank
+            assign panel_description = collection.description
+          endif
+          assign panel_url = collection.url
+          if panel_url == blank
+            assign panel_url = block.settings.button_link
+          endif
+          assign panel_button_text = block.settings.button_text
+          if panel_button_text == blank
+            assign panel_button_text = 'general.explore_collection' | t
+          endif
+          assign panel_overlay_opacity = block.settings.overlay_opacity | default: 35 | times: 1.0 | divided_by: 100.0
+        %}
+        <article
+          class="collection-panel collection-panel--{{ block.settings.layout }}"
+          style="--collection-panel-overlay-opacity: {{ panel_overlay_opacity }};"
+          {{ block.shopify_attributes }}
+        >
+          <div class="collection-panel__media">
+            {% if panel_image %}
+              <div class="collection-panel__image-wrap" data-panel-image data-media-zoom>
+                <picture class="collection-panel__picture">
+                  {% if block.settings.mobile_image %}
+                    <source
+                      media="(max-width: 749px)"
+                      srcset="{{ panel_mobile_image | image_url: width: 750 }} 750w, {{ panel_mobile_image | image_url: width: 1500 }} 1500w"
+                      sizes="100vw"
+                    >
+                  {% endif %}
+                  <source
+                    media="(min-width: 750px)"
+                    srcset="{{ panel_image | image_url: width: 1600 }} 1600w, {{ panel_image | image_url: width: 2400 }} 2400w"
+                    sizes="100vw"
+                  >
+                  <img
+                    src="{{ panel_image | image_url: width: 1600 }}"
+                    alt="{{ panel_image.alt | default: panel_heading | escape }}"
+                    class="collection-panel__image"
+                    loading="lazy"
+                    width="{{ panel_image.width | default: 1600 }}"
+                    height="{{ panel_image.height | default: 2000 }}"
+                  >
+                </picture>
+              </div>
+            {% endif %}
+
+            {% if block.settings.video %}
+              <div class="collection-panel__video-wrap">
+                {{
+                  block.settings.video
+                  | video_tag:
+                    image: panel_image,
+                    autoplay: true,
+                    loop: true,
+                    muted: true,
+                    controls: false,
+                    class: 'collection-panel__video'
+                }}
+              </div>
+            {% endif %}
+
+            <div class="collection-panel__overlay"></div>
+          </div>
+
+          <div class="collection-panel__content">
+            <span class="collection-panel__index text-eyebrow" aria-hidden="true">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
+
+            {% if panel_heading != blank %}
+              <h3 class="collection-panel__heading text-display" data-reveal-text>{{ panel_heading }}</h3>
+            {% endif %}
+
+            <div class="collection-panel__body" data-reveal="up">
+              {% if panel_description != blank %}
+                <div class="collection-panel__description text-body-lg" data-reveal-child>{{ panel_description }}</div>
+              {% endif %}
+
+              {% if block.settings.quote != blank %}
+                <blockquote class="collection-panel__quote" data-reveal-child>
+                  <span class="collection-panel__quote-mark" aria-hidden="true">&#8220;</span>
+                  {{ block.settings.quote }}
+                </blockquote>
+              {% endif %}
+
+              {% if panel_url != blank %}
+                <div class="collection-panel__cta" data-reveal-child>
+                  {% render 'button', text: panel_button_text, url: panel_url, style: 'secondary' %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </article>
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .signature-collection {
+    background-color: var(--signature-collection-background, var(--color-background));
+    padding-block: var(--signature-collection-spacing, var(--space-section-md));
+  }
+
+  .signature-collection__intro {
+    max-width: 40rem;
+    margin: 0 auto var(--space-2xl);
+    padding-inline: var(--page-margin);
+    text-align: center;
+  }
+  .signature-collection__intro-heading {
+    margin-top: var(--space-sm);
+  }
+
+  .signature-collection__panels {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+
+  /* ---------- Panel shell ---------- */
+  .collection-panel {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    min-height: 90vh;
+  }
+  .collection-panel__media {
+    position: absolute;
+    inset: 0;
+  }
+  .collection-panel__picture,
+  .collection-panel__image,
+  .collection-panel__video-wrap,
+  .collection-panel__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .collection-panel__image-wrap {
+    position: absolute;
+    inset: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .collection-panel__video-wrap { display: none; }
+  }
+  .collection-panel__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, var(--color-foreground) 0%, transparent 55%);
+    opacity: var(--collection-panel-overlay-opacity, 0.35);
+    pointer-events: none;
+  }
+
+  .collection-panel__content {
+    position: relative;
+    z-index: 1;
+    margin-top: auto;
+    width: 100%;
+    padding: var(--space-2xl) var(--page-margin);
+    color: var(--color-background);
+    display: flex;
+    flex-direction: column;
+  }
+  .collection-panel__index {
+    color: inherit;
+    opacity: 0.7;
+    margin-bottom: var(--space-sm);
+  }
+  .collection-panel__heading {
+    max-width: 16ch;
+    margin-bottom: var(--space-md);
+  }
+  .collection-panel__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    max-width: 32rem;
+  }
+  .collection-panel__quote {
+    position: relative;
+    margin: var(--space-2xs) 0 0;
+    padding-top: var(--space-md);
+    font-family: var(--font-display--family);
+    font-style: italic;
+    font-size: var(--font-size-h6);
+    line-height: var(--line-height-heading);
+  }
+  .collection-panel__quote-mark {
+    position: absolute;
+    top: -0.25rem;
+    left: -0.15em;
+    font-size: 3rem;
+    font-style: normal;
+    color: var(--color-accent-soft);
+    line-height: 1;
+    z-index: -1;
+  }
+  .collection-panel__cta {
+    margin-top: var(--space-sm);
+  }
+
+  /* ---------- Tablet (750px+) — left/right layouts become a real split;
+     centered stays a full-bleed overlay at every size, it never needs one. ---------- */
+  @media (min-width: 750px) {
+    .collection-panel--left,
+    .collection-panel--right {
+      min-height: 80vh;
+    }
+    .collection-panel--left .collection-panel__media,
+    .collection-panel--right .collection-panel__media {
+      position: relative;
+      inset: auto;
+      width: 55%;
+      flex-shrink: 0;
+    }
+    .collection-panel--left .collection-panel__overlay,
+    .collection-panel--right .collection-panel__overlay {
+      opacity: 0;
+    }
+    .collection-panel--left .collection-panel__content,
+    .collection-panel--right .collection-panel__content {
+      width: 45%;
+      margin-top: 0;
+      justify-content: center;
+      color: var(--color-foreground);
+      background-color: var(--signature-collection-background, var(--color-background));
+      padding-inline: var(--space-xl);
+    }
+    .collection-panel--right .collection-panel__media { order: 2; }
+    .collection-panel--right .collection-panel__content { order: 1; }
+
+    .collection-panel--center .collection-panel__content {
+      max-width: 34rem;
+      margin-inline: auto;
+      align-items: center;
+      text-align: center;
+    }
+  }
+
+  /* ---------- Desktop (1200px+) — full designed scale ---------- */
+  @media (min-width: 1200px) {
+    .collection-panel--left .collection-panel__media,
+    .collection-panel--right .collection-panel__media {
+      width: 60%;
+    }
+    .collection-panel--left .collection-panel__content,
+    .collection-panel--right .collection-panel__content {
+      width: 40%;
+      padding-inline: var(--space-2xl);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.signature_collection",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:general.content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:labels.eyebrow",
+      "default": "The Signature Edit"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.headline",
+      "default": "Collections Fit for a Court"
+    },
+    {
+      "type": "header",
+      "content": "t:general.layout"
+    },
+    {
+      "type": "select",
+      "id": "spacing",
+      "label": "t:labels.padding",
+      "options": [
+        { "value": "sm", "label": "t:options.size.small" },
+        { "value": "md", "label": "t:options.size.medium" },
+        { "value": "lg", "label": "t:options.size.large" }
+      ],
+      "default": "md"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "t:labels.background"
+    },
+    {
+      "type": "header",
+      "content": "t:general.motion"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_animations",
+      "label": "t:labels.enable_animations",
+      "info": "t:info.enable_animations",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection-panel",
+      "name": "t:general.collection_panel",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "t:labels.collection",
+          "info": "t:info.panel_collection"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "t:labels.headline"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "t:labels.description"
+        },
+        {
+          "type": "text",
+          "id": "quote",
+          "label": "t:labels.quote"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "t:labels.button_text"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "t:labels.button_link"
+        },
+        {
+          "type": "header",
+          "content": "t:general.media"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:labels.image"
+        },
+        {
+          "type": "image_picker",
+          "id": "mobile_image",
+          "label": "t:labels.mobile_image",
+          "info": "t:info.mobile_image"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "t:labels.video",
+          "info": "t:info.video"
+        },
+        {
+          "type": "range",
+          "id": "overlay_opacity",
+          "label": "t:labels.overlay_opacity",
+          "min": 0,
+          "max": 70,
+          "step": 5,
+          "unit": "%",
+          "default": 35
+        },
+        {
+          "type": "header",
+          "content": "t:general.layout"
+        },
+        {
+          "type": "select",
+          "id": "layout",
+          "label": "t:labels.panel_layout",
+          "info": "t:info.panel_layout",
+          "options": [
+            { "value": "left", "label": "t:options.alignment.left" },
+            { "value": "center", "label": "t:options.alignment.center" },
+            { "value": "right", "label": "t:options.alignment.right" }
+          ],
+          "default": "left"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.signature_collection",
+      "blocks": [
+        { "type": "collection-panel", "settings": { "layout": "left" } },
+        { "type": "collection-panel", "settings": { "layout": "right" } },
+        { "type": "collection-panel", "settings": { "layout": "center" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

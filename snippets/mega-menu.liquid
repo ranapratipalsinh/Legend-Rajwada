@@ -1,0 +1,164 @@
+{% doc %}
+  Renders one top-level navigation item's mega menu panel.
+
+  Category columns come straight from the menu's own nested structure
+  (Navigation admin: link > sub-links) — merchants manage the link
+  structure where they already expect to, not in a duplicate set of
+  blocks. Featured collection/product/promotional-banner content comes
+  from this header section's blocks whose "Applies to menu item" setting
+  matches this link's title, letting a merchant enrich specific dropdowns
+  with imagery without rebuilding their nav.
+
+  Reads `section` directly rather than taking it as a param: a snippet
+  rendered from within a section can access that section's own object
+  (see the `render` tag docs), and this snippet is only ever rendered
+  from sections/header.liquid. theme-check's static analysis can't see
+  that call site, so it flags `section` as unknown here — a documented
+  false positive, not a real bug, which is why it's disabled narrowly
+  below rather than theme-wide.
+
+  Each matching block is rendered directly from its own `block.settings`
+  (with `block.shopify_attributes` for theme-editor selection) rather than
+  via `content_for 'block'`, because that tag requires a literal id/type
+  known at author time — it can't take a value computed at runtime, which
+  is exactly what "whichever blocks match this menu item" requires. The
+  blocks/mega-menu-*.liquid files still exist and still own their
+  `{% schema %}` (required for the block type to exist at all); their
+  body is intentionally unused, and says so.
+
+  @param {link} link - The top-level navigation link being expanded
+  @param {number} index - The link's position, used only to build a unique panel id
+
+  @example
+  {% render 'mega-menu', link: link, index: forloop.index0 %}
+{% enddoc %}
+
+{%- # theme-check-disable UndefinedObject -%}
+
+{% liquid
+  assign target_title = link.title | downcase | strip
+  assign flat_link_count = 0
+  for child in link.links
+    if child.links.size == 0
+      assign flat_link_count = flat_link_count | plus: 1
+    endif
+  endfor
+%}
+
+<div class="mega-menu" id="mega-menu-{{ index }}">
+  <div class="mega-menu__columns">
+    {%- comment -%} Sub-links that themselves have children become their own labeled column. {%- endcomment -%}
+    {% for child in link.links %}
+      {% if child.links.size > 0 %}
+        <div class="mega-menu__column">
+          <p class="mega-menu__column-title text-eyebrow">{{ child.title }}</p>
+          <ul class="mega-menu__link-list">
+            {% for grandchild in child.links %}
+              <li><a href="{{ grandchild.url }}">{{ grandchild.title }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    {% endfor %}
+
+    {%- comment -%} Sub-links with no children of their own share one unlabeled column. {%- endcomment -%}
+    {% if flat_link_count > 0 %}
+      <div class="mega-menu__column">
+        <ul class="mega-menu__link-list">
+          {% for child in link.links %}
+            {% if child.links.size == 0 %}
+              <li><a href="{{ child.url }}">{{ child.title }}</a></li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="mega-menu__features">
+    {% for block in section.blocks %}
+      {% if block.settings.menu_item_title != blank and block.settings.menu_item_title | downcase | strip == target_title %}
+        {% case block.type %}
+          {% when 'mega-menu-collection' %}
+            <a href="{{ block.settings.collection.url }}" class="mega-menu-feature" {{ block.shopify_attributes }}>
+              {% render 'image', image: block.settings.collection.featured_image, class: 'mega-menu-feature__image ratio-portrait' %}
+              <span class="text-product-title">{{ block.settings.collection.title }}</span>
+            </a>
+
+          {% when 'mega-menu-product' %}
+            <a href="{{ block.settings.product.url }}" class="mega-menu-feature" {{ block.shopify_attributes }}>
+              {% render 'image', image: block.settings.product.featured_image, class: 'mega-menu-feature__image ratio-portrait' %}
+              <span class="text-product-title">{{ block.settings.product.title }}</span>
+              {% if block.settings.product %}
+                <span class="text-product-price">{{ block.settings.product.price | money }}</span>
+              {% endif %}
+            </a>
+
+          {% when 'mega-menu-banner' %}
+            <a href="{{ block.settings.button_url | default: '#' }}" class="mega-menu-feature mega-menu-feature--banner" {{ block.shopify_attributes }}>
+              {% render 'image', image: block.settings.image, class: 'mega-menu-feature__image ratio-landscape' %}
+              {% if block.settings.heading != blank %}
+                <span class="text-product-title">{{ block.settings.heading }}</span>
+              {% endif %}
+              {% if block.settings.text != blank %}
+                <span class="text-caption">{{ block.settings.text }}</span>
+              {% endif %}
+              {% if block.settings.button_label != blank %}
+                <span class="btn--text">{{ block.settings.button_label }}</span>
+              {% endif %}
+            </a>
+        {% endcase %}
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .mega-menu {
+    display: flex;
+    gap: var(--space-2xl);
+    padding: var(--space-xl);
+  }
+  .mega-menu__columns {
+    display: flex;
+    gap: var(--space-2xl);
+    flex: 1;
+  }
+  .mega-menu__column-title {
+    margin-bottom: var(--space-sm);
+    color: var(--color-foreground-soft);
+  }
+  .mega-menu__link-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+  .mega-menu__link-list a {
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-signature);
+  }
+  .mega-menu__link-list a:hover {
+    color: var(--color-accent);
+  }
+  .mega-menu__features {
+    display: flex;
+    gap: var(--space-md);
+  }
+  .mega-menu-feature {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    width: 12rem;
+    text-decoration: none;
+  }
+  .mega-menu-feature__image.image > img {
+    height: 100%;
+    object-fit: cover;
+  }
+  .mega-menu-feature--banner {
+    width: 18rem;
+  }
+{% endstylesheet %}

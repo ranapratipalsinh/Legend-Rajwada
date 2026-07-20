@@ -1,0 +1,469 @@
+{% comment %}
+  The signature hero: a full-bleed campaign moment rather than a banner.
+  One content model (media, headline, subheadline, CTA) rendered through
+  three selectable layout treatments — see the "Layout style" setting —
+  so a merchant can switch the composition without losing their content.
+  Animation timing/orchestration lives in assets/component-hero.js.
+{% endcomment %}
+
+{% liquid
+  assign desktop_image = section.settings.image
+  assign mobile_image = section.settings.mobile_image | default: section.settings.image
+  assign has_media = false
+  if desktop_image or mobile_image
+    assign has_media = true
+  endif
+
+  assign overlay_opacity = section.settings.overlay_opacity | default: 30 | times: 1.0 | divided_by: 100.0
+  assign animations_enabled = section.settings.enable_animations
+
+  assign words = section.settings.headline | split: ' '
+%}
+
+<section
+  class="hero hero--{{ section.settings.layout_style | replace: '_', '-' }}"
+  data-component="hero"
+  data-animations="{{ animations_enabled }}"
+  data-height="{{ section.settings.height }}"
+  data-align="{{ section.settings.text_alignment }}"
+  data-valign="{{ section.settings.vertical_position }}"
+  style="
+    --hero-overlay-opacity: {{ overlay_opacity }};
+    --hero-spacing: var(--space-section-{{ section.settings.spacing }});
+  "
+>
+  <div class="hero__media" data-hero-media>
+    {% if has_media %}
+      <picture class="hero__picture">
+        {% if section.settings.mobile_image %}
+          <source
+            media="(max-width: 749px)"
+            srcset="{{ mobile_image | image_url: width: 750 }} 750w, {{ mobile_image | image_url: width: 1500 }} 1500w"
+            sizes="100vw"
+          >
+        {% endif %}
+        <source
+          media="(min-width: 750px)"
+          srcset="{{ desktop_image | image_url: width: 1600 }} 1600w, {{ desktop_image | image_url: width: 2400 }} 2400w, {{ desktop_image | image_url: width: 3200 }} 3200w"
+          sizes="100vw"
+        >
+        <img
+          src="{{ desktop_image | image_url: width: 1600 }}"
+          alt="{{ desktop_image.alt | default: section.settings.headline | escape }}"
+          class="hero__image"
+          loading="eager"
+          fetchpriority="high"
+          width="{{ desktop_image.width | default: 1600 }}"
+          height="{{ desktop_image.height | default: 2000 }}"
+        >
+      </picture>
+    {% endif %}
+
+    {% if section.settings.video %}
+      <div class="hero__video-wrap">
+        {{
+          section.settings.video
+          | video_tag:
+            image: desktop_image,
+            autoplay: true,
+            loop: true,
+            muted: true,
+            controls: false,
+            class: 'hero__video'
+        }}
+      </div>
+    {% endif %}
+
+    <div class="hero__overlay" data-hero-overlay></div>
+  </div>
+
+  <div class="hero__content">
+    {% if section.settings.headline != blank %}
+      <h1 class="hero__headline text-display" data-hero-headline aria-label="{{ section.settings.headline | escape }}">
+        <span aria-hidden="true">
+          {% for word in words %}<span class="hero__word"><span>{{ word }}</span></span>{% unless forloop.last %} {% endunless %}{% endfor %}
+        </span>
+      </h1>
+    {% endif %}
+
+    {% if section.settings.subheadline != blank %}
+      <div class="hero__subheadline text-body-lg" data-hero-subheadline>{{ section.settings.subheadline }}</div>
+    {% endif %}
+
+    {% if section.settings.button_text != blank and section.settings.button_link != blank %}
+      <div class="hero__cta" data-hero-cta>
+        {% render 'button', text: section.settings.button_text, url: section.settings.button_link, style: section.settings.cta_style %}
+      </div>
+    {% endif %}
+  </div>
+
+  <button type="button" class="hero__scroll" data-hero-scroll aria-label="{{ 'hero.scroll_hint' | t }}">
+    {% render 'icon', name: 'scroll', size: 28 %}
+  </button>
+</section>
+
+{% stylesheet %}
+  .hero {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    color: var(--color-background);
+    background-color: var(--color-foreground);
+  }
+  .hero[data-height="small"] { min-height: 70svh; }
+  .hero[data-height="medium"] { min-height: 85svh; }
+  .hero[data-height="large"] { min-height: 100svh; }
+
+  .hero[data-align="left"] { align-items: flex-start; }
+  .hero[data-align="center"] { align-items: center; }
+  .hero[data-align="right"] { align-items: flex-end; }
+  .hero[data-valign="top"] { justify-content: flex-start; }
+  .hero[data-valign="center"] { justify-content: center; }
+  .hero[data-valign="bottom"] { justify-content: flex-end; }
+
+  .hero__media {
+    position: absolute;
+    inset: 0;
+    z-index: var(--z-behind);
+  }
+  .hero__picture,
+  .hero__image,
+  .hero__video-wrap,
+  .hero__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero__video-wrap { display: none; }
+  }
+  .hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--color-foreground);
+    opacity: var(--hero-overlay-opacity, 0.3);
+  }
+
+  .hero__content {
+    position: relative;
+    z-index: var(--z-raised);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    max-width: 32rem;
+    padding: var(--hero-spacing, var(--space-section-md)) var(--page-margin);
+  }
+  .hero[data-align="left"] .hero__content { text-align: left; }
+  .hero[data-align="center"] .hero__content { text-align: center; align-items: center; }
+  .hero[data-align="right"] .hero__content { text-align: right; align-items: flex-end; }
+
+  .hero__headline {
+    color: inherit;
+  }
+  .hero__word {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+  }
+  .hero__word > span {
+    display: inline-block;
+    will-change: transform;
+  }
+  .hero__subheadline {
+    color: inherit;
+    opacity: 0.85;
+    max-width: 32rem;
+  }
+
+  .hero__scroll {
+    position: absolute;
+    left: 50%;
+    bottom: var(--space-lg);
+    transform: translateX(-50%);
+    z-index: var(--z-raised);
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: var(--space-2xs);
+    opacity: 0.85;
+    transition: opacity var(--duration-fast) var(--ease-signature);
+  }
+  .hero__scroll:hover {
+    opacity: 1;
+  }
+  .hero__scroll[data-bounce] {
+    animation: hero-scroll-bounce 2s var(--ease-signature) infinite;
+  }
+  @keyframes hero-scroll-bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ---------- Mobile (base) — every layout style converges here on
+     purpose: an off-center grid or a side-by-side split has no room to
+     breathe under ~400px, so all three read as one full-bleed, bottom-
+     anchored treatment with a bottom-weighted scrim for legibility. ---------- */
+  .hero {
+    min-height: 85svh;
+  }
+  .hero[data-height="small"] { min-height: 60svh; }
+  .hero[data-height="large"] { min-height: 100svh; }
+  .hero__content {
+    align-items: flex-start !important;
+    text-align: left !important;
+    justify-content: flex-end;
+    max-width: none;
+  }
+  .hero {
+    justify-content: flex-end !important;
+  }
+  .hero__overlay {
+    background: linear-gradient(0deg, var(--color-foreground) 0%, transparent 55%);
+  }
+  .hero__scroll {
+    display: none;
+  }
+
+  /* ---------- Tablet (750px+) — editorial split becomes a real two-column
+     composition here; asymmetrical and cinematic stay in the mobile
+     convergence a little longer since the off-center crop needs more
+     width than a tablet portrait gives it. ---------- */
+  @media (min-width: 750px) {
+    .hero__scroll {
+      display: block;
+    }
+    .hero__content {
+      max-width: 34rem;
+    }
+
+    .hero--editorial-split {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      min-height: 0;
+    }
+    .hero--editorial-split .hero__media {
+      position: relative;
+      inset: auto;
+      grid-column: 1;
+    }
+    .hero--editorial-split .hero__overlay {
+      opacity: 0;
+    }
+    .hero--editorial-split .hero__content {
+      grid-column: 2;
+      grid-row: 1;
+      position: relative;
+      background-color: var(--color-background);
+      color: var(--color-foreground);
+      justify-content: center;
+      align-items: flex-start !important;
+      text-align: left !important;
+      max-width: none;
+    }
+  }
+
+  /* ---------- Laptop (990px+) — asymmetrical's signature off-center crop
+     switches on here; it needs the extra width tablet doesn't have. ---------- */
+  @media (min-width: 990px) {
+    .hero {
+      justify-content: center !important;
+    }
+    .hero[data-valign="top"] { justify-content: flex-start !important; }
+    .hero[data-valign="bottom"] { justify-content: flex-end !important; }
+    .hero[data-align="left"] { align-items: flex-start; }
+    .hero[data-align="center"] { align-items: center; }
+    .hero[data-align="right"] { align-items: flex-end; }
+    .hero__content {
+      align-items: unset !important;
+      text-align: unset !important;
+    }
+    .hero[data-align="left"] .hero__content { text-align: left; align-items: flex-start; }
+    .hero[data-align="center"] .hero__content { text-align: center; align-items: center; }
+    .hero[data-align="right"] .hero__content { text-align: right; align-items: flex-end; }
+    .hero__overlay {
+      background: var(--color-foreground);
+    }
+
+    .hero--asymmetrical .hero__media {
+      left: 22%;
+    }
+    .hero--asymmetrical .hero__content {
+      max-width: 26rem;
+    }
+    .hero--asymmetrical .hero__overlay {
+      background: linear-gradient(90deg, var(--color-foreground) 0%, var(--color-foreground) 15%, transparent 55%);
+    }
+  }
+
+  /* ---------- Desktop (1200px+) — full designed scale: more breathing
+     room around the asymmetrical offset and the split panel. ---------- */
+  @media (min-width: 1200px) {
+    .hero--asymmetrical .hero__media {
+      left: 30%;
+    }
+    .hero--asymmetrical .hero__content {
+      max-width: 30rem;
+      padding-inline-start: var(--space-2xl);
+    }
+    .hero--editorial-split .hero__content {
+      padding-inline: var(--space-2xl);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.hero",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:general.layout"
+    },
+    {
+      "type": "select",
+      "id": "layout_style",
+      "label": "t:labels.layout_style",
+      "info": "t:info.layout_style",
+      "options": [
+        { "value": "cinematic", "label": "t:options.layout_style.cinematic" },
+        { "value": "editorial_split", "label": "t:options.layout_style.editorial_split" },
+        { "value": "asymmetrical", "label": "t:options.layout_style.asymmetrical" }
+      ],
+      "default": "asymmetrical"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "t:labels.height",
+      "options": [
+        { "value": "small", "label": "t:options.height.small" },
+        { "value": "medium", "label": "t:options.height.medium" },
+        { "value": "large", "label": "t:options.height.large" }
+      ],
+      "default": "large"
+    },
+    {
+      "type": "select",
+      "id": "spacing",
+      "label": "t:labels.padding",
+      "options": [
+        { "value": "sm", "label": "t:options.size.small" },
+        { "value": "md", "label": "t:options.size.medium" },
+        { "value": "lg", "label": "t:options.size.large" }
+      ],
+      "default": "md"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "t:labels.alignment",
+      "options": [
+        { "value": "left", "label": "t:options.alignment.left" },
+        { "value": "center", "label": "t:options.alignment.center" },
+        { "value": "right", "label": "t:options.alignment.right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "vertical_position",
+      "label": "t:labels.vertical_position",
+      "options": [
+        { "value": "top", "label": "t:options.vertical_position.top" },
+        { "value": "center", "label": "t:options.vertical_position.center" },
+        { "value": "bottom", "label": "t:options.vertical_position.bottom" }
+      ],
+      "default": "bottom"
+    },
+    {
+      "type": "header",
+      "content": "t:general.media"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.image"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "t:labels.mobile_image",
+      "info": "t:info.mobile_image"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "t:labels.video",
+      "info": "t:info.video"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "t:labels.overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "t:general.content"
+    },
+    {
+      "type": "text",
+      "id": "headline",
+      "label": "t:labels.headline",
+      "default": "Sherwani, Reimagined"
+    },
+    {
+      "type": "richtext",
+      "id": "subheadline",
+      "label": "t:labels.subheadline",
+      "default": "<p>Bespoke Indo-Western couture for the modern wedding, cut by hand and worn for a lifetime.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "t:labels.button_text",
+      "default": "Explore the Collection"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "t:labels.button_link"
+    },
+    {
+      "type": "select",
+      "id": "cta_style",
+      "label": "t:labels.button_style",
+      "options": [
+        { "value": "primary", "label": "t:general.primary" },
+        { "value": "secondary", "label": "t:general.secondary" },
+        { "value": "text", "label": "t:labels.text" }
+      ],
+      "default": "primary"
+    },
+    {
+      "type": "header",
+      "content": "t:general.motion"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_animations",
+      "label": "t:labels.enable_animations",
+      "info": "t:info.enable_animations",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.hero"
+    }
+  ]
+}
+{% endschema %}
