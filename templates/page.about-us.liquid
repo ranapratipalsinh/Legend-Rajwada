@@ -1,0 +1,34 @@
+{% comment %}
+  About Us page template. Assign this to a Page named "About Us" in
+  Shopify Admin (Online Store > Pages > About Us > Theme template >
+  page.about-us). Write the real brand story in the page body there —
+  this template only supplies the layout, not the copy.
+{% endcomment %}
+<div class="about-page">
+  <div class="page-width">
+    <div class="grid">
+      <div class="grid__item medium-up--five-sixths medium-up--push-one-twelfth">
+        <div class="section-header text-center">
+          <h1>{{ page.title }}</h1>
+          <p class="about-page__breadcrumb">
+            <a href="{{ routes.root_url }}">{{ 'general.breadcrumbs.home' | t }}</a>
+            <span aria-hidden="true">/</span>
+            {{ page.title }}
+          </p>
+        </div>
+
+        <div class="rte about-page__content">
+          {{ page.content }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="about-page__cta">
+    <div class="page-width about-page__cta-inner">
+      <h2>{{ 'about_page.cta.title' | t }}</h2>
+      <p>{{ 'about_page.cta.text' | t }}</p>
+      <a class="btn" href="{{ pages.contact.url | default: routes.root_url }}">{{ 'about_page.cta.button' | t }}</a>
+    </div>
+  </div>
+</div>
