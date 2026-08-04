@@ -1,0 +1,169 @@
+{% comment %}
+  This section is used in the list-collections template to render a list of
+  collections.
+
+  https://shopify.dev/docs/storefronts/themes/architecture/templates/collection
+{% endcomment %}
+
+<div class="premium-section">
+  <div class="premium-container">
+    <div class="section-header reveal">
+      <p class="section-label">Discover</p>
+      <h1 class="section-title">Our Collections</h1>
+      <div class="ornament-divider">
+        <span class="ornament-diamond"></span>
+      </div>
+    </div>
+
+    <div class="collections-grid">
+      {% for collection in collections %}
+        <a href="{{ collection.url }}" class="collection-grid-card reveal" aria-label="{{ collection.title }}">
+          <div class="collection-grid-image premium-image-hover">
+            {% if collection.featured_image %}
+              {% render 'image',
+                class: 'collection-card__image',
+                image: collection.featured_image,
+                width: 800,
+                height: 600,
+                crop: 'center'
+              %}
+            {% else %}
+              <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--color-background-card);">
+                <svg fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" style="width:3rem;height:3rem;color:var(--color-border-gold);">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                </svg>
+              </div>
+            {% endif %}
+            <div class="collection-grid-overlay">
+              <h3 class="collection-grid-title">{{ collection.title }}</h3>
+              {% if collection.description %}
+                <p class="collection-grid-desc">{{ collection.description | strip_html | truncatewords: 12 }}</p>
+              {% endif %}
+              <span class="collection-grid-cta">Explore →</span>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .section-label {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 400;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 0.8rem;
+  }
+
+  .collections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+  }
+
+  .collection-grid-card {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: var(--transition-smooth);
+  }
+
+  .collection-grid-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .collection-grid-image {
+    position: relative;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    background: var(--color-background-card);
+    border: 1px solid var(--color-border-subtle);
+  }
+
+  .collection-grid-image img,
+  .collection-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .collection-grid-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(8, 7, 6, 0.9) 0%, rgba(8, 7, 6, 0.3) 50%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 2rem;
+    transition: var(--transition-smooth);
+  }
+
+  .collection-grid-card:hover .collection-grid-overlay {
+    background: linear-gradient(to top, rgba(8, 7, 6, 0.95) 0%, rgba(8, 7, 6, 0.5) 60%, rgba(8, 7, 6, 0.2) 100%);
+  }
+
+  .collection-grid-title {
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    color: var(--color-text-main);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .collection-grid-desc {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin-bottom: 0.8rem;
+  }
+
+  .collection-grid-cta {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: var(--color-secondary);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: var(--transition-smooth);
+  }
+
+  .collection-grid-card:hover .collection-grid-cta {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .collections-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .collection-grid-overlay {
+      padding: 1.5rem;
+    }
+
+    .collection-grid-title {
+      font-size: 1.1rem;
+    }
+
+    .collection-grid-cta {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.collections_grid",
+  "settings": [],
+  "presets": [{ "name": "t:general.collections_grid" }]
+}
+{% endschema %}

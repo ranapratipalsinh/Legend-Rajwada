@@ -1,0 +1,162 @@
+{% comment %}
+  This section is used in the search template to render search results for
+  products, articles, and pages.
+
+  https://shopify.dev/docs/storefronts/themes/architecture/templates/search
+{% endcomment %}
+
+<div class="premium-section" style="min-height: 60vh;">
+  <div class="premium-container">
+    <div class="section-header reveal">
+      <h1 class="section-title">Search</h1>
+      <div class="ornament-divider">
+        <span class="ornament-diamond"></span>
+      </div>
+    </div>
+
+    <form action="{{ routes.search_url }}" method="get" role="search" class="premium-search-form reveal">
+      <div class="search-input-wrapper">
+        <input
+          type="search"
+          name="q"
+          value="{{ search.terms | escape }}"
+          placeholder="Search our royal collection..."
+          class="premium-search-input"
+          autocomplete="off"
+        >
+        <button type="submit" class="premium-search-btn" aria-label="Search">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:1.2rem;height:1.2rem;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+          </svg>
+        </button>
+      </div>
+    </form>
+
+    {% if search.performed %}
+      {% if search.results_count == 0 %}
+        <div class="search-no-results reveal" style="text-align: center; padding: 3rem 0;">
+          <p style="color: var(--color-text-muted); font-size: 1.1rem; margin-bottom: 2rem; font-weight: 300;">
+            No results found for "<strong style="color: var(--color-text-main);">{{ search.terms }}</strong>". Please try a different search.
+          </p>
+          <a href="{{ routes.all_products_collection_url }}" class="btn-premium">Browse All Products</a>
+        </div>
+      {% else %}
+        <p class="search-results-count reveal" style="text-align: center; color: var(--color-text-muted); font-size: 0.9rem; margin-bottom: 3rem;">
+          {{ search.results_count }} results for "<strong style="color: var(--color-text-main);">{{ search.terms }}</strong>"
+        </p>
+
+        <div class="search-results-grid">
+          {% paginate search.results by 20 %}
+            {% for result in search.results %}
+              <div class="premium-product-card reveal">
+                <a href="{{ result.url }}" class="product-card-link">
+                  {% assign featured_image = result.featured_image | default: result.image %}
+                  <div class="premium-image-hover product-card-image-wrap">
+                    {% if featured_image %}
+                      <img src="{{ featured_image | image_url: width: 600 }}" style="width:100%;height:100%;object-fit:cover;" loading="lazy" alt="{{ result.title }}">
+                    {% else %}
+                      <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--color-background-card);">
+                        <svg fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" style="width:3rem;height:3rem;color:var(--color-border-gold);">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                        </svg>
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="product-card-info" style="padding-top: 1.2rem; text-align: center;">
+                    <h3 class="product-card-title">{{ result.title }}</h3>
+                    {% if result.price %}
+                      <p class="product-card-price">{{ result.price | money }}</p>
+                    {% endif %}
+                  </div>
+                </a>
+              </div>
+            {% endfor %}
+
+            {% if paginate.pages > 1 %}
+              <div class="premium-pagination">
+                {{ paginate | default_pagination }}
+              </div>
+            {% endif %}
+          {% endpaginate %}
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .premium-search-form {
+    max-width: 600px;
+    margin: 0 auto 3rem;
+  }
+
+  .search-input-wrapper {
+    display: flex;
+    border: 1px solid var(--color-border-gold);
+    background: var(--color-background-card);
+    transition: var(--transition-smooth);
+  }
+
+  .search-input-wrapper:focus-within {
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 1px var(--color-secondary);
+  }
+
+  .premium-search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 16px 20px;
+    color: var(--color-text-main);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    outline: none;
+    letter-spacing: 0.5px;
+  }
+
+  .premium-search-input::placeholder {
+    color: var(--color-text-muted);
+    font-weight: 300;
+  }
+
+  .premium-search-btn {
+    background: transparent;
+    border: none;
+    padding: 16px 20px;
+    color: var(--color-secondary);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    display: flex;
+    align-items: center;
+  }
+
+  .premium-search-btn:hover {
+    color: var(--color-accent-light);
+  }
+
+  .search-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2.5rem 2rem;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .search-results-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem 1rem;
+    }
+
+    .premium-search-input {
+      padding: 14px 16px;
+      font-size: 0.9rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.search",
+  "settings": []
+}
+{% endschema %}

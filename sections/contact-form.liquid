@@ -1,0 +1,172 @@
+{% comment %}
+  Contact page: title + a real Shopify contact form (name/email/phone/
+  message), styled to match this theme's premium dark/gold aesthetic.
+  This theme shipped with no contact form at all before this section.
+{% endcomment %}
+
+<div class="premium-section" style="min-height: 50vh;">
+  <div class="premium-container" style="max-width: 640px;">
+    <div class="section-header reveal">
+      <p class="section-label">{{ section.settings.label }}</p>
+      <h1 class="section-title">{{ page.title }}</h1>
+      <div class="ornament-divider">
+        <span class="ornament-diamond"></span>
+      </div>
+      {%- if section.settings.intro != blank -%}
+        <p class="contact-intro">{{ section.settings.intro }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- assign form_id = 'ContactForm' -%}
+    {% form 'contact', id: form_id, class: 'contact-form reveal' %}
+      {%- if form.posted_successfully? -%}
+        <p class="contact-form__message contact-form__message--success">
+          {{ 'contact.form.post_success' | t }}
+        </p>
+      {%- endif -%}
+
+      {%- if form.errors -%}
+        <p class="contact-form__message contact-form__message--error">
+          {%- for field in form.errors -%}
+            {{ form.errors.messages[field] }}{% unless forloop.last %} {% endunless %}
+          {%- endfor -%}
+        </p>
+      {%- endif -%}
+
+      <div class="contact-form__row">
+        <label for="{{ form_id }}-name">{{ 'contact.form.name' | t }}</label>
+        <input type="text" id="{{ form_id }}-name" name="contact[{{ 'contact.form.name' | t }}]" value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}">
+      </div>
+
+      <div class="contact-form__row">
+        <label for="{{ form_id }}-email">{{ 'contact.form.email' | t }} *</label>
+        <input
+          type="email"
+          id="{{ form_id }}-email"
+          name="contact[email]"
+          autocomplete="email"
+          autocorrect="off"
+          autocapitalize="off"
+          value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+          aria-required="true"
+          required
+        >
+      </div>
+
+      <div class="contact-form__row">
+        <label for="{{ form_id }}-phone">{{ 'contact.form.phone' | t }}</label>
+        <input type="tel" id="{{ form_id }}-phone" name="contact[{{ 'contact.form.phone' | t }}]" value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}">
+      </div>
+
+      <div class="contact-form__row">
+        <label for="{{ form_id }}-body">{{ 'contact.form.message' | t }}</label>
+        <textarea rows="6" id="{{ form_id }}-body" name="contact[{{ 'contact.form.message' | t }}]">{% if form.body %}{{ form.body }}{% endif %}</textarea>
+      </div>
+
+      <button type="submit" class="btn-premium btn-premium-filled">{{ 'contact.form.send' | t }}</button>
+    {% endform %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .section-label {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--color-secondary);
+    margin-bottom: 0.5rem;
+  }
+
+  .contact-intro {
+    color: var(--color-text-muted);
+    max-width: 480px;
+    margin: 1rem auto 0;
+    line-height: 1.7;
+  }
+
+  .contact-form {
+    margin-top: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .contact-form__row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .contact-form__row label {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .contact-form__row input,
+  .contact-form__row textarea {
+    background-color: var(--color-background-card);
+    border: 1px solid var(--color-border-subtle);
+    color: var(--color-text-main);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    padding: 12px 16px;
+    transition: var(--transition-smooth);
+  }
+
+  .contact-form__row input:focus,
+  .contact-form__row textarea:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+  }
+
+  .contact-form__row textarea {
+    resize: vertical;
+  }
+
+  .contact-form button[type="submit"] {
+    align-self: flex-start;
+    margin-top: 0.5rem;
+    border: none;
+  }
+
+  .contact-form__message {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    border: 1px solid;
+  }
+
+  .contact-form__message--success {
+    color: var(--color-success);
+    border-color: var(--color-success);
+  }
+
+  .contact-form__message--error {
+    color: var(--color-danger);
+    border-color: var(--color-danger);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Contact Form",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Top Label",
+      "default": "Get In Touch"
+    },
+    {
+      "type": "textarea",
+      "id": "intro",
+      "label": "Intro Text",
+      "default": "We'd love to hear from you. Reach out for bespoke consultations, order enquiries, or anything else."
+    }
+  ]
+}
+{% endschema %}

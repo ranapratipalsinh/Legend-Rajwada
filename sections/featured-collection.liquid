@@ -1,0 +1,183 @@
+<div class="featured-collection premium-section">
+  <div class="premium-container">
+    <div class="section-header reveal">
+      <p class="section-label">{{ section.settings.label | default: 'Curated For You' }}</p>
+      <h2 class="section-title">{{ section.settings.title }}</h2>
+      <div class="ornament-divider">
+        <span class="ornament-diamond"></span>
+      </div>
+      {%- if section.settings.description != blank -%}
+        <p class="section-subtitle">{{ section.settings.description }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- assign featured_collection = section.settings.collection -%}
+    {%- if featured_collection == blank -%}
+      {%- assign featured_collection = collections.all -%}
+    {%- endif -%}
+
+    <div class="featured-collection-grid">
+      {%- if featured_collection.products.size > 0 -%}
+        {%- for product in featured_collection.products limit: 4 -%}
+          <div class="product-card reveal reveal-delay-{{ forloop.index }}" style="text-align: center;">
+            <a href="{{ product.url }}" class="product-card-link" aria-label="{{ product.title }}">
+              <div class="premium-image-hover product-card-image-wrap">
+                {%- if product.featured_image -%}
+                  <img src="{{ product.featured_image | image_url: width: 600 }}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" alt="{{ product.title }}">
+                {%- else -%}
+                  <img src="{{ 'product_suit.png' | asset_url }}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" alt="{{ product.title }}">
+                {%- endif -%}
+                <div class="product-card-overlay">
+                  <span class="btn-premium">View Details</span>
+                </div>
+              </div>
+              <div class="product-card-info">
+                <h3 class="product-card-title">{{ product.title }}</h3>
+                <p class="product-card-price">{{ product.price | money }}</p>
+              </div>
+            </a>
+          </div>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for i in (1..4) -%}
+          <div class="product-card reveal reveal-delay-{{ i }}" style="text-align: center;">
+            <a href="/collections/all" class="product-card-link">
+              <div class="premium-image-hover product-card-image-wrap">
+                <img src="{{ 'product_suit.png' | asset_url }}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" alt="Bespoke Suit Placeholder">
+                <div class="product-card-overlay">
+                  <span class="btn-premium">View Details</span>
+                </div>
+              </div>
+              <div class="product-card-info">
+                <h3 class="product-card-title">Royal Sherwani (Sample {{ i }})</h3>
+                <p class="product-card-price">Rs. 1,45,000</p>
+              </div>
+            </a>
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+
+    <div class="featured-collection-cta reveal">
+      {%- if featured_collection != blank and featured_collection.url != blank -%}
+        <a href="{{ featured_collection.url }}" class="btn-premium">View Full Collection</a>
+      {%- else -%}
+        <a href="{{ routes.all_products_collection_url }}" class="btn-premium">View Full Collection</a>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .section-label {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 400;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 0.8rem;
+  }
+
+  .featured-collection-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2.5rem;
+  }
+
+  .product-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .product-card-image-wrap {
+    aspect-ratio: 3/4;
+    background-color: var(--color-background-card);
+    border: 1px solid var(--color-border-subtle);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .product-card-info {
+    padding: 0 0.5rem;
+  }
+
+  .featured-collection-cta {
+    text-align: center;
+    margin-top: clamp(2.5rem, 4vw, 4rem);
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 1024px) {
+    .featured-collection-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .featured-collection-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+
+    .product-card-info {
+      padding: 0;
+    }
+
+    .section-label {
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .featured-collection-grid {
+      gap: 1rem;
+    }
+
+    .product-card-image-wrap {
+      margin-bottom: 1rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Premium Collection",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "default": "Curated For You",
+      "label": "Section Label"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "default": "The Royal Edit",
+      "label": "Section Title"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "default": "Handpicked masterpieces that embody the spirit of regal tradition and contemporary luxury.",
+      "label": "Section Description"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Select Collection"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Premium Collection",
+      "category": "Collection"
+    }
+  ]
+}
+{% endschema %}

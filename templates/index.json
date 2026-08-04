@@ -1,0 +1,49 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "hero-banner",
+      "settings": {
+        "image": "shopify://shop_images/PC_01280_20copy_202.jpg_shopify_optimized.jpg",
+        "subtitle_top": "Handcrafted Since 1985",
+        "heading": "The Heritage Collection",
+        "subheading": "Where timeless artistry meets regal elegance. Each piece is a masterwork of bespoke craftsmanship.",
+        "button_label": "Explore the Collection",
+        "button_link": ""
+      }
+    },
+    "collection": {
+      "type": "featured-collection",
+      "settings": {
+        "label": "Curated For You",
+        "title": "The Royal Edit",
+        "description": "Handpicked masterpieces that embody the spirit of regal tradition and contemporary luxury.",
+        "collection": ""
+      }
+    },
+    "brand-story": {
+      "type": "brand-story",
+      "settings": {
+        "label": "Our Heritage",
+        "heading": "A Legacy of Royal Craftsmanship",
+        "text": "<p>For generations, our artisans have woven stories of regal elegance into every thread. Each garment is a testament to the art of bespoke tailoring — where heritage meets haute couture.</p><p>From the finest fabrics sourced across the realm to the intricate hand-embroidery that adorns every piece, our creations are designed for those who appreciate the extraordinary.</p>",
+        "image": "shopify://shop_images/WhatsApp_Image_2026-08-02_at_2.19.54_PM_1.jpg",
+        "button_label": "Discover Our Legacy",
+        "button_link": "/pages/our-legacy"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "collection",
+    "brand-story"
+  ]
+}

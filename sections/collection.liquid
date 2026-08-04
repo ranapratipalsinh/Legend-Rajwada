@@ -1,0 +1,116 @@
+{% comment %}
+  This section is used in the collection template to render collection page
+  listing all products within a collection.
+
+  https://shopify.dev/docs/storefronts/themes/architecture/templates/collection
+{% endcomment %}
+
+<div class="premium-section">
+  <div class="premium-container">
+    <div class="collection-header section-header reveal">
+      <h1 class="section-title">{{ collection.title }}</h1>
+      <div class="ornament-divider">
+        <span class="ornament-diamond"></span>
+      </div>
+      {% if collection.description != blank %}
+        <p class="section-subtitle">{{ collection.description }}</p>
+      {% endif %}
+    </div>
+
+    <div class="collection-products-grid">
+      {% paginate collection.products by 24 %}
+        {% for product in collection.products %}
+          <div class="premium-product-card reveal" style="--reveal-delay: {{ forloop.index | times: 0.05 }}s;">
+            <a href="{{ product.url }}" class="product-card-link" aria-label="{{ product.title }}">
+              <div class="premium-image-hover product-card-image-wrap">
+                {% if product.featured_image %}
+                  {% render 'image',
+                    class: 'collection-product__image',
+                    image: product.featured_image,
+                    width: 600,
+                    height: 800,
+                    crop: 'center'
+                  %}
+                {% else %}
+                  <img src="{{ 'product_suit.png' | asset_url }}" style="width: 100%; height: 100%; object-fit: cover;" alt="Placeholder">
+                {% endif %}
+                <div class="product-card-overlay">
+                  <span class="btn-premium">View Details</span>
+                </div>
+              </div>
+              <div class="product-card-info" style="padding-top: 1.2rem; text-align: center;">
+                <h3 class="product-card-title">{{ product.title }}</h3>
+                <p class="product-card-price">{{ product.price | money }}</p>
+              </div>
+            </a>
+          </div>
+        {% endfor %}
+
+        {% if paginate.pages > 1 %}
+          <div class="premium-pagination">
+            {{ paginate | default_pagination }}
+          </div>
+        {% endif %}
+      {% endpaginate %}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .collection-products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 3rem 2.5rem;
+  }
+
+  .premium-pagination {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+    margin-top: 4rem;
+    font-family: var(--font-body);
+  }
+
+  .premium-pagination a, .premium-pagination span {
+    padding: 10px 18px;
+    border: 1px solid var(--color-border-gold);
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: var(--transition-smooth);
+    font-size: 0.85rem;
+  }
+
+  .premium-pagination .current {
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+    border-color: var(--color-secondary);
+  }
+
+  .premium-pagination a:hover {
+    color: var(--color-secondary);
+    border-color: var(--color-secondary);
+    background: rgba(201, 169, 110, 0.05);
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .collection-products-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .collection-products-grid {
+      gap: 1.2rem 0.8rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.collection",
+  "settings": []
+}
+{% endschema %}

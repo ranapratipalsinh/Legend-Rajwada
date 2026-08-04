@@ -1,0 +1,31 @@
+{% comment %}
+  This section is used in the 404 template to render page shown when customers
+  enter an invalid store URL.
+
+  https://shopify.dev/docs/storefronts/themes/architecture/templates/404
+{% endcomment %}
+
+<div class="premium-section" style="min-height: 60vh; display: flex; align-items: center;">
+  <div class="premium-container" style="text-align: center; width: 100%;">
+    <div class="reveal">
+      <p class="section-label" style="color: var(--color-accent); margin-bottom: 1rem;">Page Not Found</p>
+      <h1 class="section-title" style="font-size: clamp(4rem, 10vw, 8rem); margin-bottom: 1rem; line-height: 1;">404</h1>
+      <div class="ornament-divider">
+        <span class="ornament-diamond"></span>
+      </div>
+      <p style="color: var(--color-text-muted); font-size: 1.1rem; margin: 1.5rem auto 2.5rem; max-width: 450px; line-height: 1.7; font-weight: 300;">
+        The page you seek has ventured beyond our realm. Perhaps explore our curated collections instead.
+      </p>
+      <a href="{{ routes.all_products_collection_url }}" class="btn-premium">
+        Explore Collections
+      </a>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:general.404",
+  "settings": []
+}
+{% endschema %}

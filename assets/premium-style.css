@@ -1,0 +1,576 @@
+/* ============================================================
+   LEGEND RAJWADA — Premium Royal Theme Stylesheet
+   A luxury ethnic wear boutique experience
+   ============================================================ */
+
+:root {
+  /* Royal Color Palette */
+  --color-primary: #0B0B0B;
+  --color-secondary: #C9A96E;
+  --color-accent: #A07D4A;
+  --color-accent-light: #E0C99A;
+  --color-text-main: #F0EDE8;
+  --color-text-muted: #9A9590;
+  --color-background-main: #080706;
+  --color-background-card: #121110;
+  --color-background-elevated: #1A1816;
+  --color-border-subtle: rgba(201, 169, 110, 0.12);
+  --color-border-gold: rgba(201, 169, 110, 0.35);
+  --color-overlay-dark: rgba(8, 7, 6, 0.85);
+  --color-success: #6B8E6B;
+  --color-danger: #C75050;
+
+  /* Typography */
+  --font-heading: 'Cinzel', 'Playfair Display', serif;
+  --font-body: 'Inter', 'Segoe UI', sans-serif;
+
+  /* Spacing */
+  --section-padding: clamp(4rem, 8vw, 8rem);
+  --content-max-width: 1280px;
+
+  /* Animations */
+  --transition-smooth: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-fast: all 0.25s ease;
+  --transition-elegant: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Shadows */
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-elevated: 0 8px 40px rgba(0, 0, 0, 0.5);
+  --shadow-gold-glow: 0 0 30px rgba(201, 169, 110, 0.08);
+}
+
+/* ============================================================
+   GLOBAL BASE STYLES
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 7rem;
+}
+
+body {
+  background-color: var(--color-background-main);
+  color: var(--color-text-main);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  color: var(--color-secondary);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+
+a {
+  color: var(--color-secondary);
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+a:hover {
+  color: var(--color-accent-light);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+::selection {
+  background: var(--color-secondary);
+  color: var(--color-primary);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-secondary);
+}
+
+/* ============================================================
+   ORNAMENTAL DIVIDERS
+   ============================================================ */
+.ornament-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.5rem auto;
+  width: fit-content;
+}
+
+.ornament-divider::before,
+.ornament-divider::after {
+  content: '';
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-secondary), transparent);
+}
+
+.ornament-divider .ornament-diamond {
+  width: 8px;
+  height: 8px;
+  background: var(--color-secondary);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+/* Simple gold line divider */
+.gold-line {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-secondary), transparent);
+  margin: 0 auto;
+  border: none;
+}
+
+/* ============================================================
+   PREMIUM BUTTON STYLES
+   ============================================================ */
+.btn-premium {
+  display: inline-block;
+  background-color: transparent;
+  color: var(--color-secondary);
+  border: 1px solid var(--color-secondary);
+  padding: 14px 40px;
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.btn-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(201, 169, 110, 0.15), transparent);
+  transition: left 0.6s ease;
+  z-index: -1;
+}
+
+.btn-premium:hover {
+  background-color: var(--color-secondary);
+  color: var(--color-primary);
+  box-shadow: 0 4px 25px rgba(201, 169, 110, 0.25);
+  transform: translateY(-1px);
+  letter-spacing: 4px;
+}
+
+.btn-premium:hover::before {
+  left: 100%;
+}
+
+.btn-premium-filled {
+  background-color: var(--color-secondary);
+  color: var(--color-primary);
+  border-color: var(--color-secondary);
+}
+
+.btn-premium-filled:hover {
+  background-color: var(--color-accent-light);
+  border-color: var(--color-accent-light);
+}
+
+/* ============================================================
+   PREMIUM IMAGE HOVER EFFECTS
+   ============================================================ */
+.premium-image-hover {
+  overflow: hidden;
+  position: relative;
+}
+
+.premium-image-hover img {
+  transition: transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.premium-image-hover:hover img {
+  transform: scale(1.08);
+}
+
+/* Gold border shimmer on hover */
+.premium-image-hover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid transparent;
+  transition: border-color 0.6s ease;
+  pointer-events: none;
+}
+
+.premium-image-hover:hover::after {
+  border-color: var(--color-border-gold);
+}
+
+/* ============================================================
+   SCROLL REVEAL ANIMATIONS
+   ============================================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* Fade in from left/right */
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-left.revealed,
+.reveal-right.revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ============================================================
+   ANNOUNCEMENT BAR
+   ============================================================ */
+.announcement-bar {
+  background: linear-gradient(90deg, var(--color-accent), var(--color-secondary), var(--color-accent));
+  color: var(--color-primary);
+  text-align: center;
+  padding: 8px 20px;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+}
+
+.announcement-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: announcement-shimmer 4s ease-in-out infinite;
+}
+
+@keyframes announcement-shimmer {
+  0% { left: -50%; }
+  100% { left: 150%; }
+}
+
+/* ============================================================
+   BACK TO TOP BUTTON
+   ============================================================ */
+.back-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 48px;
+  height: 48px;
+  background: var(--color-background-elevated);
+  border: 1px solid var(--color-border-gold);
+  color: var(--color-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 90;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: var(--transition-smooth);
+  backdrop-filter: blur(10px);
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.back-to-top:hover {
+  background: var(--color-secondary);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-gold-glow);
+}
+
+/* ============================================================
+   TRUST BADGES
+   ============================================================ */
+.trust-badges {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--color-border-subtle);
+  flex-wrap: wrap;
+}
+
+.trust-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.5px;
+}
+
+.trust-badge svg {
+  width: 18px;
+  height: 18px;
+  color: var(--color-secondary);
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   SOCIAL SHARE BUTTONS
+   ============================================================ */
+.social-share {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.social-share-label {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.social-share-link {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  transition: var(--transition-smooth);
+}
+
+.social-share-link:hover {
+  border-color: var(--color-secondary);
+  color: var(--color-secondary);
+  background: rgba(201, 169, 110, 0.05);
+}
+
+.social-share-link svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ============================================================
+   SECTION UTILITY STYLES
+   ============================================================ */
+.premium-section {
+  padding: var(--section-padding) 4%;
+  background-color: var(--color-background-main);
+}
+
+.premium-section-alt {
+  padding: var(--section-padding) 4%;
+  background-color: var(--color-background-card);
+}
+
+.premium-container {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.section-title {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  color: var(--color-secondary);
+  margin-bottom: 1rem;
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+.section-subtitle {
+  font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+  color: var(--color-text-muted);
+  font-weight: 300;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* ============================================================
+   PRODUCT CARD STYLES (Global)
+   ============================================================ */
+.product-card,
+.premium-product-card {
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  position: relative;
+}
+
+.product-card:hover,
+.premium-product-card:hover {
+  transform: translateY(-4px);
+}
+
+.product-card-title {
+  font-family: var(--font-body) !important;
+  font-size: 1rem;
+  color: var(--color-text-main);
+  margin-bottom: 0.5rem;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-transform: none;
+}
+
+.product-card-price {
+  color: var(--color-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Product card hover overlay */
+.product-card-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(8,7,6,0.9) 0%, transparent 100%);
+  padding: 2rem 1rem 1.2rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: var(--transition-smooth);
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.premium-image-hover:hover .product-card-overlay {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.product-card-overlay .btn-premium {
+  padding: 8px 24px;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+}
+
+/* ============================================================
+   SHOPIFY DYNAMIC CHECKOUT BUTTON OVERRIDES
+   ============================================================ */
+.shopify-payment-button__button {
+  background-color: var(--color-secondary) !important;
+  color: var(--color-primary) !important;
+  font-family: var(--font-heading) !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+  border-radius: 0 !important;
+  transition: var(--transition-smooth) !important;
+  font-size: 0.85rem !important;
+}
+
+.shopify-payment-button__button:hover {
+  background-color: var(--color-accent) !important;
+  box-shadow: 0 4px 20px rgba(201, 169, 110, 0.2) !important;
+}
+
+.shopify-payment-button__button--unbranded {
+  background-color: var(--color-secondary) !important;
+  color: var(--color-primary) !important;
+}
+
+/* ============================================================
+   MOBILE RESPONSIVE UTILITIES
+   ============================================================ */
+@media (max-width: 768px) {
+  .premium-section,
+  .premium-section-alt {
+    padding: clamp(2.5rem, 6vw, 4rem) 5%;
+  }
+
+  .trust-badges {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .social-share {
+    flex-wrap: wrap;
+  }
+
+  .back-to-top {
+    bottom: 1.2rem;
+    right: 1.2rem;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-premium {
+    padding: 12px 28px;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+  }
+
+  .section-title {
+    letter-spacing: 2px;
+  }
+}

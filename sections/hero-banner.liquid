@@ -1,0 +1,249 @@
+<div class="hero-banner-wrapper">
+  {%- if section.settings.image -%}
+    <div class="hero-image-container">
+      {{ section.settings.image | image_url: width: 2000 | image_tag: class: 'hero-image', loading: 'eager' }}
+    </div>
+  {%- else -%}
+    <div class="hero-image-container">
+      <img src="{{ 'luxury_hero.png' | asset_url }}" class="hero-image" loading="eager" alt="Luxury Hero Banner">
+    </div>
+  {%- endif -%}
+
+  <div class="hero-overlay"></div>
+
+  <div class="hero-content reveal">
+    {%- if section.settings.subtitle_top != blank -%}
+      <p class="hero-subtitle-top">{{ section.settings.subtitle_top }}</p>
+    {%- endif -%}
+
+    <div class="ornament-divider">
+      <span class="ornament-diamond"></span>
+    </div>
+
+    {%- if section.settings.heading != blank -%}
+      <h2 class="hero-heading">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    {%- if section.settings.subheading != blank -%}
+      <p class="hero-subheading">{{ section.settings.subheading }}</p>
+    {%- endif -%}
+
+    <div class="ornament-divider" style="margin-bottom: 2.5rem;">
+      <span class="ornament-diamond"></span>
+    </div>
+
+    {%- if section.settings.button_label != blank -%}
+      {%- assign hero_link = section.settings.button_link | default: '/collections/all' -%}
+      <a href="{{ hero_link }}" class="btn-premium">{{ section.settings.button_label }}</a>
+    {%- endif -%}
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="hero-scroll-indicator">
+    <div class="scroll-line"></div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .hero-banner-wrapper {
+    position: relative;
+    height: 100vh;
+    min-height: 650px;
+    max-height: 1000px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: var(--color-background-main);
+  }
+
+  .hero-image-container {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  .hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: hero-zoom 20s ease-in-out infinite alternate;
+  }
+
+  @keyframes hero-zoom {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.08); }
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      to bottom,
+      rgba(8, 7, 6, 0.3) 0%,
+      rgba(8, 7, 6, 0.55) 40%,
+      rgba(8, 7, 6, 0.75) 80%,
+      rgba(8, 7, 6, 0.95) 100%
+    );
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 3.5rem 3rem;
+    max-width: 800px;
+    margin: 0 1.5rem;
+  }
+
+  .hero-subtitle-top {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--color-secondary);
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-heading {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    margin-bottom: 1.5rem;
+    color: var(--color-text-main);
+    text-shadow: 0 2px 20px rgba(0,0,0,0.4);
+    line-height: 1.15;
+    font-weight: 400;
+    letter-spacing: 4px;
+  }
+
+  .hero-subheading {
+    font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+    font-weight: 300;
+    margin-bottom: 0.5rem;
+    letter-spacing: 1px;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    max-width: 550px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Scroll Indicator */
+  .hero-scroll-indicator {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--color-secondary), transparent);
+    animation: scroll-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes scroll-pulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(0.6); }
+    50% { opacity: 1; transform: scaleY(1); }
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .hero-banner-wrapper {
+      height: 85vh;
+      min-height: 500px;
+    }
+
+    .hero-content {
+      padding: 2.5rem 1.5rem;
+      margin: 0 1rem;
+    }
+
+    .hero-heading {
+      font-size: 2.2rem;
+      letter-spacing: 2px;
+      margin-bottom: 1rem;
+    }
+
+    .hero-subheading {
+      font-size: 0.92rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-subtitle-top {
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+    }
+
+    .hero-scroll-indicator {
+      bottom: 1.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-banner-wrapper {
+      height: 75vh;
+      min-height: 420px;
+    }
+
+    .hero-heading {
+      font-size: 1.8rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Premium Hero Banner",
+  "tag": "section",
+  "class": "section-hero-banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image",
+      "info": "High resolution, landscape orientation recommended (min 2000px wide)."
+    },
+    {
+      "type": "text",
+      "id": "subtitle_top",
+      "default": "Handcrafted Since 1985",
+      "label": "Top Subtitle"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "The Heritage Collection",
+      "label": "Heading"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "default": "Where timeless artistry meets regal elegance. Each piece is a masterwork of bespoke craftsmanship.",
+      "label": "Subheading"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "default": "Explore the Collection",
+      "label": "Button Label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Premium Hero Banner",
+      "category": "Image"
+    }
+  ]
+}
+{% endschema %}

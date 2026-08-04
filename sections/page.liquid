@@ -1,0 +1,119 @@
+{% comment %}
+  This section is used in the page template to render store pages like About us
+  or Contact us.
+
+  https://shopify.dev/docs/storefronts/themes/architecture/templates/page
+{% endcomment %}
+
+<div class="premium-section" style="min-height: 50vh;">
+  <div class="premium-container" style="max-width: 900px;">
+    <div class="section-header reveal">
+      <h1 class="section-title">{{ page.title }}</h1>
+      <div class="ornament-divider">
+        <span class="ornament-diamond"></span>
+      </div>
+    </div>
+
+    <div class="premium-page-content reveal">
+      {{ page.content }}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  /* Page bodies sometimes get pasted in as raw HTML from another site
+     (Bootstrap-style wrapper divs, plain default-black text, etc.)
+     instead of using this theme's rte formatting. Force every element
+     inside to inherit a readable color regardless of what markup or
+     foreign classes it arrives with, since this is a dark theme and
+     unstyled text defaults to black-on-black. */
+  .premium-page-content,
+  .premium-page-content * {
+    color: var(--color-text-muted) !important;
+  }
+
+  .premium-page-content {
+    font-size: 1rem;
+    line-height: 1.9;
+  }
+
+  .premium-page-content h1,
+  .premium-page-content h2,
+  .premium-page-content h3,
+  .premium-page-content h4,
+  .premium-page-content h5,
+  .premium-page-content h6 {
+    color: var(--color-secondary) !important;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .premium-page-content p {
+    margin-bottom: 1.5rem;
+  }
+
+  .premium-page-content a {
+    color: var(--color-secondary) !important;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: var(--transition-smooth);
+  }
+
+  .premium-page-content a:hover {
+    color: var(--color-accent-light) !important;
+  }
+
+  .premium-page-content img {
+    max-width: 100%;
+    height: auto;
+    margin: 2rem 0;
+    border: 1px solid var(--color-border-subtle);
+  }
+
+  .premium-page-content ul,
+  .premium-page-content ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .premium-page-content li {
+    margin-bottom: 0.5rem;
+  }
+
+  .premium-page-content blockquote {
+    border-left: 2px solid var(--color-secondary);
+    padding-left: 1.5rem;
+    margin: 2rem 0;
+    font-style: italic;
+    color: var(--color-text-main) !important;
+  }
+
+  .premium-page-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2rem 0;
+  }
+
+  .premium-page-content th,
+  .premium-page-content td {
+    border: 1px solid var(--color-border-subtle);
+    padding: 12px 16px;
+    text-align: left;
+  }
+
+  .premium-page-content th {
+    background: var(--color-background-card);
+    color: var(--color-secondary) !important;
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.page",
+  "settings": []
+}
+{% endschema %}

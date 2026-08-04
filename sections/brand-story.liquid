@@ -1,0 +1,158 @@
+<div class="brand-story premium-section-alt">
+  <div class="premium-container">
+    <div class="brand-story-grid">
+      <div class="brand-story-content reveal-left">
+        <p class="section-label">{{ section.settings.label }}</p>
+        <h2 class="brand-story-title">{{ section.settings.heading }}</h2>
+        <div class="ornament-divider" style="margin: 1.5rem 0; justify-content: flex-start;">
+          <span class="ornament-diamond"></span>
+        </div>
+        <div class="brand-story-text">
+          {{ section.settings.text }}
+        </div>
+        {%- if section.settings.button_label != blank -%}
+          {%- assign story_link = section.settings.button_link | default: '/pages/about' -%}
+          <a href="{{ story_link }}" class="btn-premium" style="margin-top: 2rem;">{{ section.settings.button_label }}</a>
+        {%- endif -%}
+      </div>
+      <div class="brand-story-visual reveal-right">
+        {%- if section.settings.image -%}
+          <div class="brand-story-image premium-image-hover">
+            {{ section.settings.image | image_url: width: 800 | image_tag: loading: 'lazy' }}
+          </div>
+        {%- else -%}
+          <div class="brand-story-image premium-image-hover">
+            <img src="{{ 'product_suit.png' | asset_url }}" loading="lazy" alt="Brand Story" style="width:100%;height:100%;object-fit:cover;">
+          </div>
+        {%- endif -%}
+        <div class="brand-story-accent"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .brand-story-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: center;
+  }
+
+  .brand-story-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: var(--color-text-main);
+    line-height: 1.2;
+    letter-spacing: 2px;
+  }
+
+  .brand-story-text {
+    font-size: 0.95rem;
+    line-height: 1.9;
+    color: var(--color-text-muted);
+    font-weight: 300;
+  }
+
+  .brand-story-text p {
+    margin-bottom: 1rem;
+  }
+
+  .brand-story-visual {
+    position: relative;
+  }
+
+  .brand-story-image {
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    border: 1px solid var(--color-border-subtle);
+    position: relative;
+    z-index: 1;
+  }
+
+  .brand-story-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .brand-story-accent {
+    position: absolute;
+    top: -24px;
+    right: -24px;
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--color-border-gold);
+    z-index: 0;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 991px) {
+    .brand-story-grid {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+
+    .brand-story-accent {
+      display: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .brand-story-title {
+      font-size: 1.8rem;
+    }
+
+    .brand-story-text {
+      font-size: 0.9rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Brand Story",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "default": "Our Heritage",
+      "label": "Section Label"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "A Legacy of Royal Craftsmanship",
+      "label": "Heading"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "default": "<p>For generations, our artisans have woven stories of regal elegance into every thread. Each garment is a testament to the art of bespoke tailoring — where heritage meets haute couture.</p><p>From the finest fabrics sourced across the realm to the intricate hand-embroidery that adorns every piece, our creations are designed for those who appreciate the extraordinary.</p>",
+      "label": "Story Text"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Story Image"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "default": "Discover Our Legacy",
+      "label": "Button Label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Brand Story",
+      "category": "Text"
+    }
+  ]
+}
+{% endschema %}
