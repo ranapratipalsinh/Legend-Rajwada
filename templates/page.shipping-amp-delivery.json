@@ -1,0 +1,13 @@
+{
+  "sections": {
+    "main": {
+      "type": "page",
+      "settings": {
+        "label": "Customer Care"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

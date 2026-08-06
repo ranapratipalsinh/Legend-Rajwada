@@ -11,7 +11,7 @@
           {{ section.settings.text }}
         </div>
         {%- if section.settings.button_label != blank -%}
-          {%- assign story_link = section.settings.button_link | default: '/pages/about' -%}
+          {%- assign story_link = section.settings.button_link | default: '/collections/all' -%}
           <a href="{{ story_link }}" class="btn-premium" style="margin-top: 2rem;">{{ section.settings.button_label }}</a>
         {%- endif -%}
       </div>

@@ -8,11 +8,23 @@
 <div class="premium-section" style="min-height: 50vh;">
   <div class="premium-container" style="max-width: 900px;">
     <div class="section-header reveal">
+      {%- if section.settings.label != blank -%}
+        <p class="section-label">{{ section.settings.label }}</p>
+      {%- endif -%}
       <h1 class="section-title">{{ page.title }}</h1>
       <div class="ornament-divider">
         <span class="ornament-diamond"></span>
       </div>
     </div>
+
+    {%- if section.settings.image != blank -%}
+      <div class="page-header-image-wrap reveal">
+        <div class="page-header-image premium-image-hover">
+          {{ section.settings.image | image_url: width: 800 | image_tag: loading: 'lazy' }}
+        </div>
+        <div class="page-header-image-accent"></div>
+      </div>
+    {%- endif -%}
 
     <div class="premium-page-content reveal">
       {{ page.content }}
@@ -21,6 +33,53 @@
 </div>
 
 {% stylesheet %}
+  .section-label {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--color-secondary);
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+
+  .page-header-image-wrap {
+    position: relative;
+    max-width: 420px;
+    margin: 2.5rem auto 3rem;
+  }
+
+  .page-header-image {
+    aspect-ratio: 3/2;
+    overflow: hidden;
+    border: 1px solid var(--color-border-subtle);
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-header-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .page-header-image-accent {
+    position: absolute;
+    top: -24px;
+    right: -24px;
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--color-border-gold);
+    z-index: 0;
+  }
+
+  @media (max-width: 768px) {
+    .page-header-image-accent {
+      display: none;
+    }
+  }
+
   /* Page bodies sometimes get pasted in as raw HTML from another site
      (Bootstrap-style wrapper divs, plain default-black text, etc.)
      instead of using this theme's rte formatting. Force every element
@@ -114,6 +173,19 @@
 {% schema %}
 {
   "name": "t:general.page",
-  "settings": []
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Eyebrow Label",
+      "info": "Small label above the page title, e.g. \"Our Heritage\" or \"Legal\"."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Header Image",
+      "info": "Optional. Leave blank for text-only pages like policies."
+    }
+  ]
 }
 {% endschema %}

@@ -1,0 +1,13 @@
+{
+  "sections": {
+    "main": {
+      "type": "page",
+      "settings": {
+        "label": "Our Heritage"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
