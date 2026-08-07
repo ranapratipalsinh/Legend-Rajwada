@@ -11,6 +11,29 @@
   "sections": {
     "main": {
       "type": "collection",
+      "blocks": {
+        "cat-1": {
+          "type": "category_link",
+          "settings": { "collection": "bandhgala" }
+        },
+        "cat-2": {
+          "type": "category_link",
+          "settings": { "collection": "sherwani" }
+        },
+        "cat-3": {
+          "type": "category_link",
+          "settings": { "collection": "the-indian-long-coat" }
+        },
+        "cat-4": {
+          "type": "category_link",
+          "settings": { "collection": "coti" }
+        },
+        "cat-5": {
+          "type": "category_link",
+          "settings": { "collection": "achkan" }
+        }
+      },
+      "block_order": ["cat-1", "cat-2", "cat-3", "cat-4", "cat-5"],
       "settings": {}
     }
   },

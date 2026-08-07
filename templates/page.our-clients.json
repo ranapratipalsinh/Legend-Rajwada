@@ -1,0 +1,107 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "slideshow": {
+      "type": "slideshow",
+      "blocks": {
+        "slide_NDXHzi": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/PC_01280_20copy_202.jpg_shopify_optimized.jpg",
+            "heading": "Ravindra Bhati",
+            "subheading": "",
+            "button_label": "",
+            "button_link": ""
+          }
+        },
+        "slide_6HcNxJ": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/PC_01280_20copy_202.jpg_shopify_optimized.jpg",
+            "heading": "Parimal nathvani",
+            "subheading": "",
+            "button_label": "",
+            "button_link": ""
+          }
+        }
+      },
+      "block_order": [
+        "slide_NDXHzi",
+        "slide_6HcNxJ"
+      ],
+      "settings": {}
+    },
+    "gallery": {
+      "type": "gallery",
+      "blocks": {
+        "image_zcqGEj": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/PC_01199_20copy_202.jpg_shopify.jpg",
+            "caption": ""
+          }
+        },
+        "image_MnD9nK": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/PC_01166_20copy.jpg_shopify.jpg",
+            "caption": ""
+          }
+        },
+        "image_ezhMfN": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/PC_00703_20copy_202.jpg_shopify.jpg",
+            "caption": ""
+          }
+        },
+        "image_7TKneN": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/PC_01325_20copy.jpg_1__shopify.jpg",
+            "caption": ""
+          }
+        },
+        "image_Kd73nK": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/WhatsApp_Image_2026-08-02_at_2.19.54_PM_1.jpg",
+            "caption": ""
+          }
+        },
+        "image_JcXeCx": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/WhatsApp_Image_2026-08-02_at_2.19.54_PM.jpg",
+            "caption": "Rajdeepsinh jadeja"
+          }
+        }
+      },
+      "block_order": [
+        "image_zcqGEj",
+        "image_MnD9nK",
+        "image_ezhMfN",
+        "image_7TKneN",
+        "image_Kd73nK",
+        "image_JcXeCx"
+      ],
+      "settings": {
+        "label": "Our Clients",
+        "title": "Real Moments, Real Elegance",
+        "columns": 3
+      }
+    }
+  },
+  "order": [
+    "slideshow",
+    "gallery"
+  ]
+}

@@ -1,0 +1,173 @@
+{% comment %}
+  Homepage category tiles. Each block picks an existing collection —
+  the merchant can add as many as they want from the theme editor's
+  "Add block" button without touching any code, and each one always
+  links to a real collection.url, so there's no way to add a block
+  that "breaks" the page.
+{% endcomment %}
+
+<div class="premium-section">
+  <div class="premium-container">
+    {%- if section.settings.label != blank or section.settings.title != blank -%}
+      <div class="section-header reveal">
+        {%- if section.settings.label != blank -%}
+          <p class="section-label">{{ section.settings.label }}</p>
+        {%- endif -%}
+        {%- if section.settings.title != blank -%}
+          <h2 class="section-title">{{ section.settings.title }}</h2>
+        {%- endif -%}
+        <div class="ornament-divider">
+          <span class="ornament-diamond"></span>
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="category-grid">
+        {%- for block in section.blocks -%}
+          {%- assign category_collection = collections[block.settings.collection] -%}
+          <a
+            href="{% if category_collection != blank %}{{ category_collection.url }}{% else %}#{% endif %}"
+            class="category-tile premium-image-hover reveal"
+            style="--reveal-delay: {{ forloop.index | times: 0.05 }}s;"
+            {{ block.shopify_attributes }}
+          >
+            <div class="category-tile__image-wrap">
+              {%- if block.settings.image != blank -%}
+                {{ block.settings.image | image_url: width: 600 | image_tag: loading: 'lazy' }}
+              {%- elsif category_collection.featured_image != blank -%}
+                {{ category_collection.featured_image | image_url: width: 600 | image_tag: loading: 'lazy' }}
+              {%- else -%}
+                <div class="category-tile__placeholder"></div>
+              {%- endif -%}
+            </div>
+            <h3 class="category-tile__title">
+              {%- if block.settings.label != blank -%}
+                {{ block.settings.label }}
+              {%- elsif category_collection != blank -%}
+                {{ category_collection.title }}
+              {%- else -%}
+                Select a collection
+              {%- endif -%}
+            </h3>
+          </a>
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <p class="category-showcase-empty">Add categories using the "Add block" button in the theme editor.</p>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+  }
+
+  .category-tile {
+    display: block;
+    text-decoration: none;
+  }
+
+  .category-tile__image-wrap {
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    border: 1px solid var(--color-border-subtle);
+  }
+
+  .category-tile__image-wrap img,
+  .category-tile__placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .category-tile__placeholder {
+    background-color: var(--color-background-card);
+  }
+
+  .category-tile__title {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--color-text-main);
+    transition: var(--transition-smooth);
+  }
+
+  .category-tile:hover .category-tile__title {
+    color: var(--color-secondary);
+  }
+
+  .category-showcase-empty {
+    text-align: center;
+    color: var(--color-text-muted);
+    padding: 3rem 0;
+  }
+
+  @media (max-width: 480px) {
+    .category-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.2rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Category Showcase",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Eyebrow Label",
+      "default": "Shop By Style"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Our Categories"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Custom Label",
+          "info": "Optional. Leave blank to use the collection's own title."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Custom Image",
+          "info": "Optional. Leave blank to use the collection's featured image."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Category Showcase",
+      "blocks": [
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" }
+      ]
+    }
+  ]
+}
+{% endschema %}

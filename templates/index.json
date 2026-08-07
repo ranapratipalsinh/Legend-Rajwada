@@ -20,6 +20,60 @@
         "button_link": ""
       }
     },
+    "categories": {
+      "type": "category-showcase",
+      "blocks": {
+        "cat-1": {
+          "type": "category",
+          "settings": {
+            "collection": "bandhgala",
+            "label": "",
+            "image": "shopify://shop_images/WhatsApp_Image_2026-08-02_at_2.19.54_PM.jpg"
+          }
+        },
+        "cat-2": {
+          "type": "category",
+          "settings": {
+            "collection": "sherwani",
+            "label": "",
+            "image": "shopify://shop_images/PC_01178_20copy_202.jpg_shopify.jpg"
+          }
+        },
+        "cat-3": {
+          "type": "category",
+          "settings": {
+            "collection": "the-indian-long-coat",
+            "label": ""
+          }
+        },
+        "cat-4": {
+          "type": "category",
+          "settings": {
+            "collection": "coti",
+            "label": "",
+            "image": "shopify://shop_images/PC_01325_20copy.jpg_1__shopify.jpg"
+          }
+        },
+        "cat-5": {
+          "type": "category",
+          "settings": {
+            "collection": "achkan",
+            "label": ""
+          }
+        }
+      },
+      "block_order": [
+        "cat-1",
+        "cat-2",
+        "cat-3",
+        "cat-4",
+        "cat-5"
+      ],
+      "settings": {
+        "label": "Shop By Style",
+        "title": "Our Categories"
+      }
+    },
     "collection": {
       "type": "featured-collection",
       "settings": {
@@ -43,6 +97,7 @@
   },
   "order": [
     "main",
+    "categories",
     "collection",
     "brand-story"
   ]

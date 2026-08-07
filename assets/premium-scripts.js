@@ -253,6 +253,66 @@ document.addEventListener('shopify:section:load', function(event) {
 });
 
 // ============================================================
+// SLIDESHOW
+// ============================================================
+// Scoped per-container so it can be (re-)initialized for a single
+// freshly-reloaded section without touching any other slideshow on the
+// page. data-slideshow-initialized guards against double-binding a
+// second interval onto the same slideshow.
+window.premiumTheme.initSlideshow = function(root) {
+  const scope = root || document;
+  const slideshows = scope.querySelectorAll('[data-slideshow]');
+
+  slideshows.forEach(function(slideshow) {
+    if (slideshow.dataset.slideshowInitialized) return;
+    slideshow.dataset.slideshowInitialized = 'true';
+
+    const slides = slideshow.querySelectorAll('.slideshow__slide');
+    const dots = slideshow.querySelectorAll('.slideshow__dot');
+    const prevBtn = slideshow.querySelector('[data-slideshow-prev]');
+    const nextBtn = slideshow.querySelector('[data-slideshow-next]');
+    if (slides.length < 2) return;
+
+    let current = 0;
+    let timer = null;
+
+    function goTo(index) {
+      slides[current].classList.remove('is-active');
+      if (dots[current]) dots[current].classList.remove('is-active');
+      current = (index + slides.length) % slides.length;
+      slides[current].classList.add('is-active');
+      if (dots[current]) dots[current].classList.add('is-active');
+    }
+
+    function next() { goTo(current + 1); }
+    function prev() { goTo(current - 1); }
+
+    function startAutoplay() {
+      timer = window.setInterval(next, 6000);
+    }
+
+    function stopAutoplay() {
+      window.clearInterval(timer);
+    }
+
+    nextBtn?.addEventListener('click', function() { stopAutoplay(); next(); startAutoplay(); });
+    prevBtn?.addEventListener('click', function() { stopAutoplay(); prev(); startAutoplay(); });
+    dots.forEach(function(dot, i) {
+      dot.addEventListener('click', function() { stopAutoplay(); goTo(i); startAutoplay(); });
+    });
+
+    slideshow.addEventListener('mouseenter', stopAutoplay);
+    slideshow.addEventListener('mouseleave', startAutoplay);
+
+    startAutoplay();
+  });
+};
+
+document.addEventListener('shopify:section:load', function(event) {
+  window.premiumTheme.initSlideshow(event.target);
+});
+
+// ============================================================
 // HEADER SHRINK ON SCROLL
 // ============================================================
 window.premiumTheme.initHeaderShrink = function() {
@@ -376,4 +436,5 @@ document.addEventListener('DOMContentLoaded', function() {
   window.premiumTheme.initScrollReveal();
   window.premiumTheme.initHeaderShrink();
   window.premiumTheme.initBackToTop();
+  window.premiumTheme.initSlideshow();
 });

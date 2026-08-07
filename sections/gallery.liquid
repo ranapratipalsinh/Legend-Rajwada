@@ -1,0 +1,160 @@
+{% comment %}
+  Photo grid gallery — used for the "Our Clients" page, but generic
+  enough for any image showcase. Each block is one photo with an
+  optional caption.
+{% endcomment %}
+
+<div class="premium-section">
+  <div class="premium-container">
+    {%- if section.settings.label != blank or section.settings.title != blank -%}
+      <div class="section-header reveal">
+        {%- if section.settings.label != blank -%}
+          <p class="section-label">{{ section.settings.label }}</p>
+        {%- endif -%}
+        {%- if section.settings.title != blank -%}
+          <h2 class="section-title">{{ section.settings.title }}</h2>
+        {%- endif -%}
+        <div class="ornament-divider">
+          <span class="ornament-diamond"></span>
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="gallery-grid" style="--gallery-columns: {{ section.settings.columns }};">
+        {%- for block in section.blocks -%}
+          <div class="gallery-item premium-image-hover reveal" {{ block.shopify_attributes }}>
+            {%- if block.settings.image != blank -%}
+              {{ block.settings.image | image_url: width: 800 | image_tag: loading: 'lazy' }}
+            {%- else -%}
+              <div class="gallery-item__placeholder"></div>
+            {%- endif -%}
+            {%- if block.settings.caption != blank -%}
+              <div class="gallery-item__caption">{{ block.settings.caption }}</div>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <p class="gallery-empty">Add photos using the "Add block" button in the theme editor.</p>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--gallery-columns, 3), 1fr);
+    gap: 1.5rem;
+  }
+
+  .gallery-item {
+    position: relative;
+    aspect-ratio: 4/5;
+    overflow: hidden;
+    border: 1px solid var(--color-border-subtle);
+  }
+
+  .gallery-item img,
+  .gallery-item__placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gallery-item__placeholder {
+    background-color: var(--color-background-card);
+  }
+
+  .gallery-item__caption {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 1rem;
+    background: linear-gradient(to top, rgba(8, 7, 6, 0.85), transparent);
+    color: var(--color-text-main);
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: var(--transition-smooth);
+  }
+
+  .gallery-item:hover .gallery-item__caption {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .gallery-empty {
+    text-align: center;
+    color: var(--color-text-muted);
+    padding: 3rem 0;
+  }
+
+  @media (max-width: 991px) {
+    .gallery-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .gallery-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Gallery",
+  "max_blocks": 24,
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Eyebrow Label"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 3
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Photo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Caption"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Gallery",
+      "blocks": [
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" }
+      ]
+    }
+  ]
+}
+{% endschema %}

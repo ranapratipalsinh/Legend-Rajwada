@@ -89,6 +89,24 @@
       {% endform %}
     </div>
 
+    {%- if section.blocks.size > 0 -%}
+      <div class="shop-by-category">
+        <h4 class="sidebar-subheading">Shop By Category</h4>
+        <ul class="shop-by-category__list">
+          {%- for block in section.blocks -%}
+            {%- assign cat_collection = collections[block.settings.collection] -%}
+            {%- if cat_collection != blank -%}
+              <li>
+                <a href="{{ cat_collection.url }}" {{ block.shopify_attributes }}>
+                  {{ block.settings.label | default: cat_collection.title }}
+                </a>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+    {%- endif -%}
+
     <!-- Trust Badges -->
     <div class="trust-badges">
       <div class="trust-badge">
@@ -308,6 +326,32 @@
     width: 100%;
   }
 
+  .shop-by-category__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .shop-by-category__list a {
+    display: inline-block;
+    padding: 6px 16px;
+    border: 1px solid var(--color-border-subtle);
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: var(--transition-smooth);
+  }
+
+  .shop-by-category__list a:hover {
+    border-color: var(--color-secondary);
+    color: var(--color-secondary);
+  }
+
   /* Mobile Responsive */
   @media (max-width: 991px) {
     .premium-product-container {
@@ -359,6 +403,25 @@
 {
   "name": "t:general.product",
   "settings": [],
+  "blocks": [
+    {
+      "type": "category_link",
+      "name": "Category Link",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Custom Label",
+          "info": "Optional. Leave blank to use the collection's own title."
+        }
+      ]
+    }
+  ],
   "disabled_on": {
     "groups": ["header", "footer"]
   }
