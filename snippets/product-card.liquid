@@ -1,0 +1,190 @@
+{% doc %}
+  Renders a product card for product grids (collection, search): a portrait
+  image that cross-fades to the product's second image on hover, title, and
+  price with its sale state, plus a "Sold out" or "Sale" badge.
+
+  Also owns `.product-grid`, the list every card sits in, so any section
+  rendering cards gets the same responsive columns. The grid reads
+  --grid-columns-mobile / --grid-columns-tablet / --grid-columns-desktop
+  from the section and falls back to 2 / 3 / 4.
+
+  @param {product} product - The product to render
+  @param {boolean} [eager] - Load the image eagerly; pass true only for the first row above the fold
+
+  @example
+  <ul class="product-grid">
+    {% for product in collection.products %}
+      <li>{% render 'product-card', product: product %}</li>
+    {% endfor %}
+  </ul>
+{% enddoc %}
+
+{% liquid
+  assign on_sale = false
+  if product.compare_at_price > product.price
+    assign on_sale = true
+  endif
+
+  assign loading = 'lazy'
+  if eager
+    assign loading = 'eager'
+  endif
+
+  assign featured_image = product.featured_media.preview_image
+  assign featured_alt = featured_image.alt | default: product.title | escape
+
+  assign hover_image = nil
+  if product.media.size > 1
+    assign hover_image = product.media[1].preview_image
+  endif
+%}
+
+<article class="product-card">
+  <a href="{{ product.url }}" class="product-card__media ratio-portrait" tabindex="-1" aria-hidden="true">
+    {% if featured_image %}
+      {{
+        featured_image
+        | image_url: width: 900
+        | image_tag:
+          loading: loading,
+          widths: '300, 450, 600, 900',
+          sizes: '(min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw',
+          alt: featured_alt,
+          class: 'product-card__image'
+      }}
+      {% if hover_image %}
+        {{
+          hover_image
+          | image_url: width: 900
+          | image_tag:
+            loading: 'lazy',
+            widths: '300, 450, 600, 900',
+            sizes: '(min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw',
+            alt: '',
+            class: 'product-card__image product-card__image--hover'
+        }}
+      {% endif %}
+    {% else %}
+      {{ 'product-1' | placeholder_svg_tag: 'product-card__image product-card__placeholder' }}
+    {% endif %}
+
+    {% if product.available == false %}
+      <span class="badge product-card__badge">{{ 'products.sold_out' | t }}</span>
+    {% elsif on_sale %}
+      <span class="badge badge--sale product-card__badge">{{ 'products.sale' | t }}</span>
+    {% endif %}
+  </a>
+
+  <div class="product-card__body">
+    <h3 class="product-card__title text-product-title">
+      <a href="{{ product.url }}">{{ product.title }}</a>
+    </h3>
+    <p class="product-card__price text-product-price">
+      {% if on_sale %}
+        <s>{{ product.compare_at_price | money }}</s>
+      {% endif %}
+      {%- if product.price_varies -%}
+        {{ 'products.price_from' | t: price: product.price_min | money }}
+      {%- else -%}
+        {{ product.price | money }}
+      {%- endif -%}
+    </p>
+  </div>
+</article>
+
+{% stylesheet %}
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-columns-mobile, 2), minmax(0, 1fr));
+    gap: var(--space-lg) var(--space-sm);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  @media (min-width: 750px) {
+    .product-grid {
+      grid-template-columns: repeat(var(--grid-columns-tablet, 3), minmax(0, 1fr));
+      gap: var(--space-xl) var(--space-md);
+    }
+  }
+  @media (min-width: 990px) {
+    .product-grid {
+      grid-template-columns: repeat(var(--grid-columns-desktop, 4), minmax(0, 1fr));
+    }
+  }
+
+  .product-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  .product-card__media {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+  }
+  .product-card__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition:
+      opacity var(--duration-base) var(--ease-out-soft),
+      transform var(--duration-slow) var(--ease-out-soft);
+  }
+  .product-card__image--hover {
+    opacity: 0;
+  }
+  .product-card__placeholder {
+    fill: var(--color-line);
+  }
+  @media (hover: hover) {
+    .product-card:hover .product-card__image--hover {
+      opacity: 1;
+    }
+    .product-card:hover .product-card__image {
+      transform: scale(1.03);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .product-card__image {
+      transition: none;
+    }
+  }
+  .product-card__badge {
+    position: absolute;
+    top: var(--space-xs);
+    left: var(--space-xs);
+    background-color: var(--color-background);
+  }
+  .product-card__badge.badge--sale {
+    background-color: var(--color-signal-error);
+  }
+  .product-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+  }
+  .product-card__title a {
+    text-decoration: none;
+    color: inherit;
+  }
+  .product-card__title a::after {
+    /* Whole card is clickable via the title link, while the image link
+       stays out of the tab order so keyboard users hit each product once. */
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+  .product-card__title a:focus-visible {
+    outline: none;
+  }
+  .product-card:has(.product-card__title a:focus-visible) {
+    box-shadow: var(--shadow-focus);
+    border-radius: var(--radius-md);
+  }
+{% endstylesheet %}

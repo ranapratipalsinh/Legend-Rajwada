@@ -1,19 +1,64 @@
 {% comment %}
-  This section is used in the 404 template to render page shown when customers
-  enter an invalid store URL.
+  Page shown when a visitor lands on a URL that doesn't exist — a clear
+  message, a way back into the store, and a search field so they can look
+  for what they were after.
 
   https://shopify.dev/docs/storefronts/themes/architecture/templates/404
 {% endcomment %}
 
-<h1>{{ '404.title' | t }}</h1>
+{% liquid
+  assign continue_label = '404.back_to_shopping' | t
+  assign home_label = '404.back_home' | t
+%}
 
-<p>
-  {{ '404.not_found' | t }}
-</p>
+<div class="page-shell not-found">
+  <p class="not-found__code text-display" aria-hidden="true">{{ '404.title' | t }}</p>
+  <h1 class="not-found__title text-h4">{{ '404.not_found' | t }}</h1>
+  <p class="not-found__message text-body">{{ '404.message' | t }}</p>
 
-<a href="{{ routes.all_products_collection_url }}">
-  {{ '404.back_to_shopping' | t }}
-</a>
+  <form action="{{ routes.search_url }}" method="get" role="search" class="search-field not-found__search">
+    {% render 'icon', name: 'search', size: 20 %}
+    <label class="visually-hidden" for="NotFoundSearch">{{ 'search.placeholder' | t }}</label>
+    <input type="search" id="NotFoundSearch" name="q" placeholder="{{ 'search.placeholder' | t }}" autocomplete="off">
+    <button type="submit" class="btn--text">{{ 'search.submit' | t }}</button>
+  </form>
+
+  <div class="not-found__actions">
+    {% render 'button', text: continue_label, url: routes.all_products_collection_url, style: 'primary' %}
+    {% render 'button', text: home_label, url: routes.root_url, style: 'secondary' %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+    text-align: center;
+    padding-block: var(--space-section-sm);
+  }
+  .not-found__code {
+    color: var(--color-accent);
+  }
+  .not-found__message {
+    max-width: 32rem;
+    color: var(--color-foreground-soft);
+  }
+  .not-found__search {
+    width: min(28rem, 100%);
+  }
+  .not-found__search input {
+    flex: 1;
+    min-width: 0;
+  }
+  .not-found__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-sm);
+  }
+{% endstylesheet %}
 
 {% schema %}
 {

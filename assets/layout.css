@@ -72,6 +72,40 @@
 .section-padding--sm { padding-block: var(--space-section-sm); }
 .section-padding--lg { padding-block: var(--space-section-lg); }
 
+/* ---------- Page shell ----------
+   Shared by every template-level page section (collection, search, page,
+   blog, article, collections list, 404) so their top spacing, breadcrumb
+   and title treatment read as one system. Lives here, render-blocking,
+   because it frames the first thing a visitor sees on those pages. */
+.page-shell {
+  padding-block: var(--space-lg) var(--space-section-sm);
+}
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding-block: var(--space-md) var(--space-lg);
+}
+.page-header--center {
+  align-items: center;
+  text-align: center;
+}
+.page-header__title {
+  font-size: var(--font-size-h3);
+}
+.page-header__description {
+  max-width: 40rem;
+  color: var(--color-foreground-soft);
+}
+.page-header--center .page-header__description {
+  margin-inline: auto;
+}
+@media (min-width: 990px) {
+  .page-header__title {
+    font-size: var(--font-size-h2);
+  }
+}
+
 /* ---------- Image aspect ratios ----------
    Paired with the aspect-ratio property (not a padding-hack) so the browser
    reserves the box before the image decodes — no layout shift. */

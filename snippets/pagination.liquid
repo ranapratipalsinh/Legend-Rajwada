@@ -1,0 +1,36 @@
+{% doc %}
+  Renders numbered previous/next pagination for a `paginate` block, styled
+  by `.pagination` in assets/components.css. Renders nothing when there is
+  only one page.
+
+  @param {object} paginate - The paginate object from the surrounding {% paginate %} tag
+  @param {string} [anchor] - Optional fragment appended to every link, e.g. '#comments'
+
+  @example
+  {% paginate collection.products by 24 %}
+    ...
+    {% render 'pagination', paginate: paginate %}
+  {% endpaginate %}
+{% enddoc %}
+
+{% if paginate.pages > 1 %}
+  <nav class="pagination" aria-label="{{ 'general.pagination.label' | t }}">
+    {% if paginate.previous %}
+      <a href="{{ paginate.previous.url }}{{ anchor }}" rel="prev">{{ 'general.pagination.previous' | t }}</a>
+    {% endif %}
+
+    {% for part in paginate.parts %}
+      {% if part.is_link %}
+        <a href="{{ part.url }}{{ anchor }}">{{ part.title }}</a>
+      {% elsif part.title == paginate.current_page %}
+        <span aria-current="page">{{ part.title }}</span>
+      {% else %}
+        <span aria-hidden="true">{{ part.title }}</span>
+      {% endif %}
+    {% endfor %}
+
+    {% if paginate.next %}
+      <a href="{{ paginate.next.url }}{{ anchor }}" rel="next">{{ 'general.pagination.next' | t }}</a>
+    {% endif %}
+  </nav>
+{% endif %}

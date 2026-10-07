@@ -1,13 +1,22 @@
 {% comment %}
-  This section is used in the page template to render store pages like About us
-  or Contact us.
+  Standard store page (About us, policies written as pages, size guide…) —
+  breadcrumb, title, and the admin-written content in a comfortable reading
+  column.
 
   https://shopify.dev/docs/storefronts/themes/architecture/templates/page
 {% endcomment %}
 
-<h1>{{ page.title }}</h1>
+<div class="page-shell">
+  <div class="container-article">
+    {% render 'breadcrumb' %}
 
-{{ page.content }}
+    <header class="page-header">
+      <h1 class="page-header__title">{{ page.title }}</h1>
+    </header>
+
+    <div class="rte text-body">{{ page.content }}</div>
+  </div>
+</div>
 
 {% schema %}
 {

@@ -141,5 +141,58 @@ h6 { font-size: var(--font-size-h6); }
   white-space: nowrap;
 }
 
+/* ---------- Rich text (.rte) ----------
+   Content typed into the Shopify admin's rich-text editor (page bodies,
+   blog articles, product and collection descriptions) arrives as bare
+   HTML. critical.css zeroes every margin, so this restores a readable
+   rhythm and scales headings down to sit below the page's own title. */
+.rte > * + * {
+  margin-top: var(--space-sm);
+}
+.rte :is(h1, h2, h3, h4, h5, h6) {
+  margin-top: var(--space-lg);
+}
+.rte :is(h1, h2, h3, h4, h5, h6):first-child {
+  margin-top: 0;
+}
+.rte h1 { font-size: var(--font-size-h3); }
+.rte h2 { font-size: var(--font-size-h4); }
+.rte h3 { font-size: var(--font-size-h5); }
+.rte :is(h4, h5, h6) { font-size: var(--font-size-h6); }
+.rte a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.rte :is(ul, ol) {
+  padding-inline-start: var(--space-md);
+}
+.rte li + li {
+  margin-top: var(--space-3xs);
+}
+.rte img {
+  height: auto;
+  border-radius: var(--radius-md);
+}
+.rte blockquote {
+  padding-inline-start: var(--space-md);
+  border-inline-start: 2px solid var(--color-accent);
+  font-family: var(--font-display--family);
+  font-style: italic;
+  font-size: var(--font-size-h6);
+}
+.rte table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.rte :is(th, td) {
+  padding: var(--space-2xs) var(--space-xs);
+  border-bottom: 1px solid var(--color-line);
+  text-align: start;
+}
+.rte :is(iframe, video) {
+  max-width: 100%;
+}
+
 .text-balance { text-wrap: balance; }
 .text-pretty { text-wrap: pretty; }

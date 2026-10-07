@@ -1,68 +1,171 @@
 {% comment %}
-  This section is used in the article template to render the article page, which
-  displays the full content of the blog post and can optionally include a
-  comments section for customers (not shown in this example).
+  Blog article — breadcrumb, date and author, title, featured image, the
+  article body in a reading column, share links, and (when the blog allows
+  them) comments with a comment form.
 
   https://shopify.dev/docs/storefronts/themes/architecture/templates/article
 {% endcomment %}
 
-{% if article.image %}
-  {{ article.image | image_url: width: 1000 | image_tag }}
-{% endif %}
+{% liquid
+  assign published_date = article.published_at | time_tag: format: 'date'
+%}
 
-<h1>{{ article.title }}</h1>
+<article class="page-shell">
+  <div class="container-article">
+    {% render 'breadcrumb' %}
 
-{% assign date = article.published_at | time_tag: format: 'date' %}
-<p>{{ 'blog.article_metadata_html' | t: date: date, author: article.author }}</p>
-
-{{ article.content }}
-
-{% if blog.comments_enabled? %}
-  <h2>{{ 'blog.article_comments' | t }}</h2>
-
-  <div id="comments">
-    {% paginate article.comments by 10 %}
-      {% for comment in article.comments %}
-        <div>
-          <p>{{ comment.author }}</p>
-          <p>
-            {{- comment.created_at | time_tag: format: 'date' -}}
-          </p>
-          <p>{{ comment.content }}</p>
-        </div>
-      {% endfor %}
-
-      {{ paginate | default_pagination: anchor: 'comments' }}
-    {% endpaginate %}
+    <header class="page-header">
+      <p class="text-eyebrow">{{ 'blog.article_metadata_html' | t: date: published_date, author: article.author }}</p>
+      <h1 class="page-header__title">{{ article.title }}</h1>
+    </header>
   </div>
 
-  {% form 'new_comment', article %}
-    <h2>{{ 'blog.comment_form_title' | t }}</h2>
-
-    {{ form.errors | default_errors }}
-
-    <div>
-      <label for="author">{{ 'blog.comment_form_name' | t }}</label>
-      <input type="text" name="comment[author]" id="author" value="{{ form.author }}" required>
+  {% if article.image %}
+    <div class="article__image">
+      {% render 'image', image: article.image, width: 1800, loading: 'eager', fetchpriority: 'high' %}
     </div>
+  {% endif %}
 
-    <div>
-      <label for="email">{{ 'blog.comment_form_email' | t }}</label>
-      <input type="email" name="comment[email]" id="email" value="{{ form.email }}" required>
-    </div>
+  <div class="container-article">
+    <div class="article__content rte text-body">{{ article.content }}</div>
 
-    <div>
-      <label for="body">{{ 'blog.comment_form_body' | t }}</label>
-      <textarea name="comment[body]" id="body" required>{{ form.body }}</textarea>
-    </div>
+    {% if section.settings.show_share %}
+      <div class="article__share">
+        {% assign share_url = request.origin | append: article.url %}
+        {% render 'social-share', url: share_url, title: article.title %}
+      </div>
+    {% endif %}
 
-    <input type="submit" value="{{ 'blog.comment_form_submit' | t }}">
-  {% endform %}
-{% endif %}
+    {% if blog.comments_enabled? %}
+      <section class="article__comments" id="comments" aria-labelledby="CommentsHeading">
+        <h2 id="CommentsHeading" class="text-h5">
+          {{ 'blog.article_comments' | t }} ({{ article.comments_count }})
+        </h2>
+
+        {% paginate article.comments by 10 %}
+          {% if article.comments.size > 0 %}
+            <ol class="article__comment-list">
+              {% for comment in article.comments %}
+                <li class="article__comment">
+                  <div class="rte text-body">{{ comment.content }}</div>
+                  <p class="text-caption article__comment-meta">
+                    {{ comment.author }} &middot; {{ comment.created_at | time_tag: format: 'date' }}
+                  </p>
+                </li>
+              {% endfor %}
+            </ol>
+          {% endif %}
+
+          {% render 'pagination', paginate: paginate, anchor: '#comments' %}
+        {% endpaginate %}
+
+        {% form 'new_comment', article, class: 'article__comment-form' %}
+          <h3 class="text-h6">{{ 'blog.comment_form_title' | t }}</h3>
+
+          {% if form.posted_successfully? %}
+            <p class="field__message field__message--success" role="status">
+              {%- if blog.moderated? -%}
+                {{ 'blog.comment_moderated' | t }}
+              {%- else -%}
+                {{ 'blog.comment_posted' | t }}
+              {%- endif -%}
+            </p>
+          {% endif %}
+          {% if form.errors %}
+            <div class="field__message field__message--error" role="alert">{{ form.errors | default_errors }}</div>
+          {% endif %}
+
+          <div class="article__comment-fields">
+            <div class="field">
+              <label class="field__label" for="CommentAuthor">{{ 'blog.comment_form_name' | t }}</label>
+              <input class="field__input" type="text" name="comment[author]" id="CommentAuthor" value="{{ form.author }}" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label class="field__label" for="CommentEmail">{{ 'blog.comment_form_email' | t }}</label>
+              <input class="field__input" type="email" name="comment[email]" id="CommentEmail" value="{{ form.email }}" autocomplete="email" required>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field__label" for="CommentBody">{{ 'blog.comment_form_body' | t }}</label>
+            <textarea class="field__textarea" name="comment[body]" id="CommentBody" required>{{ form.body }}</textarea>
+          </div>
+          <div>
+            <button type="submit" class="btn btn--primary">{{ 'blog.comment_form_submit' | t }}</button>
+          </div>
+        {% endform %}
+      </section>
+    {% endif %}
+
+    <p class="article__back">
+      <a href="{{ blog.url }}" class="btn--text">{{ 'blog.back_to_blog' | t: title: blog.title }}</a>
+    </p>
+  </div>
+</article>
+
+{% stylesheet %}
+  .article__image {
+    margin-bottom: var(--space-xl);
+    overflow: hidden;
+    border-radius: var(--radius-md);
+  }
+  .article__share {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-line);
+  }
+  .article__comments {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    margin-top: var(--space-2xl);
+  }
+  .article__comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .article__comment {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--color-line);
+  }
+  .article__comment-meta {
+    color: var(--color-foreground-soft);
+  }
+  .article__comment-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  .article__comment-fields {
+    display: grid;
+    gap: var(--space-md);
+  }
+  @media (min-width: 750px) {
+    .article__comment-fields {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .article__back {
+    margin-top: var(--space-2xl);
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
   "name": "t:general.article",
-  "settings": []
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_share",
+      "label": "t:labels.show_share",
+      "default": true
+    }
+  ]
 }
 {% endschema %}

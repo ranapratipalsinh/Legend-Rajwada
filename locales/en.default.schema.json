@@ -57,7 +57,8 @@
     "legal": "Legal",
     "link_column": "Link Column",
     "testimonials": "Testimonials",
-    "testimonial": "Testimonial"
+    "testimonial": "Testimonial",
+    "contact_form": "Contact form"
   },
   "labels": {
     "alignment": "Alignment",
@@ -153,7 +154,13 @@
     "person_name": "Name",
     "person_role": "Role or relationship",
     "show_vendor": "Show vendor",
-    "show_dynamic_checkout": "Show dynamic checkout buttons"
+    "show_dynamic_checkout": "Show dynamic checkout buttons",
+    "products_per_page": "Products per page",
+    "columns_desktop": "Columns on desktop",
+    "columns_mobile": "Columns on mobile",
+    "show_sorting": "Show sorting",
+    "show_collection_description": "Show collection description",
+    "show_share": "Show share buttons"
   },
   "info": {
     "font_display": "Used for headlines, plate titles, and product names. Set sparingly.",

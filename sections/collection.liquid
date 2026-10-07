@@ -1,47 +1,164 @@
 {% comment %}
-  This section is used in the collection template to render collection page
-  listing all products within a collection.
+  Collection page — breadcrumb, title and description, a product count and
+  sort control, then a responsive grid of snippets/product-card.liquid.
+
+  Sorting is a plain GET form, so it works without JavaScript; the inline
+  `onchange` only saves the extra click on an Apply button (which <noscript>
+  still provides).
 
   https://shopify.dev/docs/storefronts/themes/architecture/templates/collection
 {% endcomment %}
 
-<h1>{{ collection.title }}</h1>
+{% liquid
+  assign columns_tablet = section.settings.columns_desktop | at_most: 3
+  assign current_sort = collection.sort_by | default: collection.default_sort_by
+%}
 
-<div class="collection-products">
-  {% paginate collection.products by 20 %}
-    {% for product in collection.products %}
-      <div class="collection-product">
-        {% if product.featured_image %}
-          {% render 'image',
-            class: 'collection-product__image',
-            image: product.featured_image,
-            url: product.url,
-            width: 400,
-            height: 400,
-            crop: 'center'
+<div
+  class="page-shell collection-page"
+  style="
+    --grid-columns-desktop: {{ section.settings.columns_desktop }};
+    --grid-columns-tablet: {{ columns_tablet }};
+    --grid-columns-mobile: {{ section.settings.columns_mobile }};
+  "
+>
+  {% render 'breadcrumb' %}
+
+  <header class="page-header">
+    <h1 class="page-header__title">{{ collection.title }}</h1>
+    {% if section.settings.show_description and collection.description != blank %}
+      <div class="page-header__description rte">{{ collection.description }}</div>
+    {% endif %}
+  </header>
+
+  {% paginate collection.products by section.settings.products_per_page %}
+    <div class="collection-toolbar">
+      <p class="collection-toolbar__count text-caption">
+        {{ 'collections.product_count' | t: count: collection.products_count }}
+      </p>
+
+      {% if section.settings.show_sort and collection.products_count > 1 %}
+        <form class="collection-toolbar__sort" method="get" action="{{ collection.url }}">
+          <label class="text-form-label" for="SortBy-{{ section.id }}">{{ 'collections.sort_by' | t }}</label>
+          <select id="SortBy-{{ section.id }}" name="sort_by" class="field__select" onchange="this.form.submit()">
+            {% for option in collection.sort_options %}
+              <option
+                value="{{ option.value | escape }}"
+                {% if option.value == current_sort %}
+                  selected
+                {% endif %}
+              >
+                {{ option.name | escape }}
+              </option>
+            {% endfor %}
+          </select>
+          <noscript>
+            <button type="submit" class="btn btn--secondary">{{ 'collections.apply' | t }}</button>
+          </noscript>
+        </form>
+      {% endif %}
+    </div>
+
+    {% if collection.products.size > 0 %}
+      <ul class="product-grid">
+        {% for product in collection.products %}
+          {% liquid
+            assign eager = false
+            if forloop.index <= section.settings.columns_desktop
+              assign eager = true
+            endif
           %}
-        {% endif %}
-        <div class="collection-product__content">
-          <p>{{ product.title | escape | link_to: product.url }}</p>
-          <p>{{ product.price | money }}</p>
-        </div>
-      </div>
-    {% endfor %}
+          <li>{% render 'product-card', product: product, eager: eager %}</li>
+        {% endfor %}
+      </ul>
 
-    {{ paginate | default_pagination }}
+      {% render 'pagination', paginate: paginate %}
+    {% else %}
+      <div class="collection-empty">
+        <p class="text-body-lg">{{ 'collections.empty' | t }}</p>
+        {% assign view_all_label = 'collections.view_all' | t %}
+        {% render 'button', text: view_all_label, url: routes.all_products_collection_url, style: 'secondary' %}
+      </div>
+    {% endif %}
   {% endpaginate %}
 </div>
 
 {% stylesheet %}
-  .collection-products {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  .collection-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    padding-block: var(--space-sm);
+    margin-bottom: var(--space-lg);
+    border-block: 1px solid var(--color-line);
+  }
+  .collection-toolbar__count {
+    color: var(--color-foreground-soft);
+  }
+  .collection-toolbar__sort {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+  .collection-toolbar__sort .field__select {
+    min-width: 12rem;
+  }
+
+  .collection-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-md);
+    padding-block: var(--space-xl);
   }
 {% endstylesheet %}
 
 {% schema %}
 {
   "name": "t:general.collection",
-  "settings": []
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "t:labels.products_per_page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "t:labels.columns_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "t:labels.columns_mobile",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "t:labels.show_sorting",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "t:labels.show_collection_description",
+      "default": true
+    }
+  ]
 }
 {% endschema %}

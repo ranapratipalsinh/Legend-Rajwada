@@ -2,7 +2,9 @@
   "404": {
     "title": "404",
     "not_found": "Page not found.",
-    "back_to_shopping": "Back to shopping"
+    "back_to_shopping": "Back to shopping",
+    "message": "The page you're looking for doesn't exist or may have moved.",
+    "back_home": "Back to home"
   },
   "general": {
     "accessibility": {
@@ -19,7 +21,12 @@
     "menu_title": "Menu",
     "explore_collection": "Explore the Collection",
     "taxes_included": "Taxes included. Shipping calculated at checkout.",
-    "taxes_excluded": "Taxes and shipping calculated at checkout."
+    "taxes_excluded": "Taxes and shipping calculated at checkout.",
+    "pagination": {
+      "label": "Pagination",
+      "previous": "Previous",
+      "next": "Next"
+    }
   },
   "products": {
     "add_to_cart": "Add to cart",
@@ -29,7 +36,8 @@
     "quantity": "Quantity",
     "decrease_quantity": "Decrease quantity",
     "increase_quantity": "Increase quantity",
-    "error_generic": "Couldn't add this to your cart. Please try again."
+    "error_generic": "Couldn't add this to your cart. Please try again.",
+    "price_from": "From {{ price }}"
   },
   "header": {
     "search": "Search",
@@ -73,7 +81,12 @@
     "comment_form_email": "Email",
     "comment_form_name": "Name",
     "comment_form_submit": "Post",
-    "comment_form_title": "Add a comment"
+    "comment_form_title": "Add a comment",
+    "read_more": "Read more",
+    "empty": "No articles have been published yet.",
+    "back_to_blog": "Back to {{ title }}",
+    "comment_posted": "Your comment has been posted.",
+    "comment_moderated": "Thanks — your comment will appear once it has been approved."
   },
   "cart": {
     "checkout": "Checkout",
@@ -102,7 +115,15 @@
     }
   },
   "collections": {
-    "title": "Collections"
+    "title": "Collections",
+    "product_count": {
+      "one": "{{ count }} product",
+      "other": "{{ count }} products"
+    },
+    "sort_by": "Sort by",
+    "apply": "Apply",
+    "empty": "This collection doesn't have any products yet.",
+    "view_all": "View all products"
   },
   "gift_card": {
     "add_to_apple_wallet": "Add to Apple Wallet",
@@ -114,7 +135,9 @@
   "password": {
     "title": "This shop is private",
     "password": "Password",
-    "enter": "Enter"
+    "enter": "Enter",
+    "owner": "Are you the store owner?",
+    "login": "Log in here"
   },
   "footer": {
     "navigation_heading": "Explore",
@@ -134,6 +157,17 @@
     "suggested_searches": "Suggested searches",
     "trending_products": "Trending products",
     "clear_recent": "Clear",
-    "view_all_results_html": "View all results for “{{ terms }}”"
+    "view_all_results_html": "View all results for “{{ terms }}”",
+    "empty_hint": "Check the spelling or try a more general term.",
+    "type_article": "Article",
+    "type_page": "Page"
+  },
+  "contact": {
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone number",
+    "message": "Message",
+    "submit": "Send message",
+    "success": "Thanks for contacting us. We'll get back to you as soon as possible."
   }
 }

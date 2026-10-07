@@ -1,44 +1,54 @@
 {% comment %}
-  This section is used in the list-collections template to render a list of
-  collections.
+  The /collections page — every collection as a portrait card with its
+  image, title and product count. A collection with no image (and no
+  products to borrow one from) shows a placeholder rather than collapsing.
 
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/collection
+  https://shopify.dev/docs/storefronts/themes/architecture/templates/list-collections
 {% endcomment %}
 
-<h1>{{ 'collections.title' | t }}</h1>
+<div class="page-shell">
+  <header class="page-header page-header--center">
+    <h1 class="page-header__title">{{ 'collections.title' | t }}</h1>
+  </header>
 
-<div
-  class="collections {{ section.settings.grid_item_width }}"
-  style="--grid-gap: {{ section.settings.grid_gap }}px"
->
-  {% for collection in collections %}
-    <a class="collection-card" href="{{ collection.url }}">
-      {% if collection.featured_image %}
-        {% render 'image',
-          class: 'collection-card__image',
-          image: collection.featured_image,
-          width: 600,
-          height: 600,
-          crop: 'center'
-        %}
-      {% endif %}
-
-      <div class="collection-card__content">
-        <p>{{ collection.title }}</p>
-
-        {% if collection.description %}
-          <p>{{ collection.description | strip_html | truncatewords: 15 }}</p>
-        {% endif %}
-      </div>
-    </a>
-  {% endfor %}
+  <ul
+    class="collections {{ section.settings.grid_item_width }}"
+    style="--grid-gap: {{ section.settings.grid_gap }}px"
+  >
+    {% for collection in collections %}
+      <li>
+        <a class="collection-card" href="{{ collection.url }}">
+          <div class="collection-card__media ratio-portrait">
+            {% if collection.featured_image %}
+              {% render 'image',
+                class: 'collection-card__image',
+                image: collection.featured_image,
+                width: 800
+              %}
+            {% else %}
+              {{ 'collection-1' | placeholder_svg_tag: 'collection-card__placeholder' }}
+            {% endif %}
+          </div>
+          <div class="collection-card__content">
+            <span class="text-collection-title">{{ collection.title }}</span>
+            <span class="collection-card__count text-caption">
+              {{- 'collections.product_count' | t: count: collection.products_count -}}
+            </span>
+          </div>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
 </div>
 
 {% stylesheet %}
   .collections {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(var(--collection-card-size), 100%), 1fr));
-    gap: var(--grid-gap);
+    gap: max(var(--grid-gap), var(--space-md));
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
   .collections--compact {
     --collection-card-size: 160px;
@@ -46,10 +56,48 @@
   .collections--full {
     --collection-card-size: 280px;
   }
+
   .collection-card {
     display: flex;
     flex-direction: column;
+    gap: var(--space-sm);
+    text-decoration: none;
+    color: inherit;
+  }
+  .collection-card__media {
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+  }
+  .collection-card__media .image {
+    height: 100%;
+  }
+  .collection-card__media img {
+    transition: transform var(--duration-slow) var(--ease-out-soft);
+  }
+  .collection-card__placeholder {
     width: 100%;
+    height: 100%;
+    fill: var(--color-line);
+  }
+  @media (hover: hover) {
+    .collection-card:hover .collection-card__media img {
+      transform: scale(1.03);
+    }
+  }
+  .collection-card:focus-visible {
+    outline: none;
+  }
+  .collection-card:focus-visible .collection-card__media {
+    box-shadow: var(--shadow-focus);
+  }
+  .collection-card__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+  }
+  .collection-card__count {
+    color: var(--color-foreground-soft);
   }
 {% endstylesheet %}
 
