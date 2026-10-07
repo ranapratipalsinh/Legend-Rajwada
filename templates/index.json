@@ -9,12 +9,27 @@
  */
 {
   "sections": {
-    "main": {
-      "type": "hello-world",
-      "settings": {}
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "layout_style": "editorial_split",
+        "height": "large",
+        "spacing": "md",
+        "text_alignment": "left",
+        "vertical_position": "bottom",
+        "image": "shopify://shop_images/WhatsApp_Image_2026-07-31_at_12.13.12_PM.jpg",
+        "mobile_image": "shopify://shop_images/Legend_Rajwada_page-0001.jpg",
+        "overlay_opacity": 15,
+        "headline": "",
+        "subheadline": "",
+        "button_text": "",
+        "button_link": "",
+        "cta_style": "primary",
+        "enable_animations": true
+      }
     }
   },
   "order": [
-    "main"
+    "hero"
   ]
 }

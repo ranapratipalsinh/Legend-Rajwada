@@ -1,7 +1,8 @@
 {% comment %}
   The Premium Luxury Footer — the closing chapter, not a link dump. Two
   layout modes (grid / centered), a brand column that carries a short
-  story rather than just a logo, and navigation/collections columns that
+  story rather than just a logo, and any number of link columns — each
+  its own "link-column" block with a merchant-editable heading — that
   collapse into accordions on mobile instead of dumping every link at
   full height. Legal links fall back to Shopify's own shop.policies when
   no dedicated menu is set, so a merchant gets working policy links the
@@ -26,6 +27,9 @@
   endif
 
   assign has_contact = false
+  if section.settings.contact_name != blank
+    assign has_contact = true
+  endif
   if section.settings.contact_email != blank
     assign has_contact = true
   endif
@@ -108,52 +112,40 @@
       {% endif %}
     </div>
 
-    {% if section.settings.menu.links.size > 0 %}
-      <nav class="site-footer__column" aria-label="{{ 'footer.navigation_heading' | t }}">
-        <button
-          type="button"
-          class="site-footer__column-trigger text-eyebrow"
-          aria-expanded="false"
-          aria-controls="footer-panel-navigation"
-          data-accordion-trigger
-        >
-          {{ 'footer.navigation_heading' | t }}
-        </button>
-        <div class="site-footer__column-panel" id="footer-panel-navigation">
-          <ul class="site-footer__link-list">
-            {% for link in section.settings.menu.links %}
-              <li><a href="{{ link.url }}" class="site-footer__link">{{ link.title }}</a></li>
-            {% endfor %}
-          </ul>
-        </div>
-      </nav>
-    {% endif %}
-
-    {% if section.settings.collections_menu.links.size > 0 %}
-      <nav class="site-footer__column" aria-label="{{ 'footer.collections_heading' | t }}">
-        <button
-          type="button"
-          class="site-footer__column-trigger text-eyebrow"
-          aria-expanded="false"
-          aria-controls="footer-panel-collections"
-          data-accordion-trigger
-        >
-          {{ 'footer.collections_heading' | t }}
-        </button>
-        <div class="site-footer__column-panel" id="footer-panel-collections">
-          <ul class="site-footer__link-list">
-            {% for link in section.settings.collections_menu.links %}
-              <li><a href="{{ link.url }}" class="site-footer__link">{{ link.title }}</a></li>
-            {% endfor %}
-          </ul>
-        </div>
-      </nav>
-    {% endif %}
+    <div class="site-footer__columns">
+      {% for block in section.blocks %}
+        {% if block.type == 'link-column' %}
+          {% if block.settings.menu.links.size > 0 %}
+            <nav class="site-footer__column" aria-label="{{ block.settings.heading }}" {{ block.shopify_attributes }}>
+              <button
+                type="button"
+                class="site-footer__column-trigger text-eyebrow"
+                aria-expanded="false"
+                aria-controls="footer-panel-{{ block.id }}"
+                data-accordion-trigger
+              >
+                {{ block.settings.heading }}
+              </button>
+              <div class="site-footer__column-panel" id="footer-panel-{{ block.id }}">
+                <ul class="site-footer__link-list">
+                  {% for link in block.settings.menu.links %}
+                    <li><a href="{{ link.url }}" class="site-footer__link">{{ link.title }}</a></li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </nav>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </div>
 
     {% if has_contact %}
       <div class="site-footer__column site-footer__contact" data-reveal="up">
         <p class="site-footer__column-title text-eyebrow" data-reveal-child>{{ 'footer.contact_heading' | t }}</p>
         <div class="site-footer__contact-body" data-reveal-child>
+          {% if section.settings.contact_name != blank %}
+            <p class="site-footer__contact-name text-body-lg">{{ section.settings.contact_name }}</p>
+          {% endif %}
           {% if section.settings.address != blank %}
             <div class="site-footer__address">{{ section.settings.address }}</div>
           {% endif %}
@@ -161,7 +153,7 @@
             <div class="site-footer__hours">{{ section.settings.hours }}</div>
           {% endif %}
           {% if section.settings.contact_phone != blank %}
-            <a href="tel:{{ section.settings.contact_phone }}" class="site-footer__link">{{ section.settings.contact_phone }}</a>
+            <div class="site-footer__phone">{{ section.settings.contact_phone }}</div>
           {% endif %}
           {% if section.settings.contact_email != blank %}
             <a href="mailto:{{ section.settings.contact_email }}" class="site-footer__link">{{ section.settings.contact_email }}</a>
@@ -285,15 +277,30 @@
     background-size: 100% 1px;
   }
 
+  .site-footer__columns {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
   .site-footer__contact-body {
     margin-top: var(--space-sm);
     display: flex;
     flex-direction: column;
     gap: var(--space-sm);
   }
+  .site-footer__contact-name {
+    color: var(--color-foreground);
+  }
   .site-footer__address,
-  .site-footer__hours {
+  .site-footer__hours,
+  .site-footer__phone {
     color: var(--color-foreground-soft);
+  }
+  .site-footer__phone {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
   }
 
   /* ---------- Divider ---------- */
@@ -379,6 +386,12 @@
       grid-column: 1 / -1;
       max-width: 34rem;
     }
+    .site-footer__columns {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+      gap: var(--space-xl);
+    }
     .site-footer__contact {
       grid-column: 1 / -1;
     }
@@ -390,13 +403,17 @@
     }
   }
 
-  /* ---------- Laptop (990px+) — the full four-column layout ---------- */
+  /* ---------- Laptop (990px+) — brand, the link-column group, and
+     contact sit side by side; the link-column group auto-fits however
+     many "link-column" blocks a merchant has added, so this works
+     whether there are one, two, or five columns. ---------- */
   @media (min-width: 990px) {
     .site-footer__main {
-      grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
+      grid-template-columns: 1.6fr 2fr 1.2fr;
       column-gap: var(--space-2xl);
     }
     .site-footer__brand,
+    .site-footer__columns,
     .site-footer__contact {
       grid-column: auto;
     }
@@ -408,7 +425,7 @@
       padding-inline: var(--space-3xl);
     }
     .site-footer__main {
-      grid-template-columns: 2fr 1fr 1fr 1.3fr;
+      grid-template-columns: 2fr 2.2fr 1.3fr;
     }
   }
 
@@ -426,6 +443,11 @@
     .site-footer--centered .site-footer__main {
       display: flex;
       flex-direction: column;
+    }
+    .site-footer--centered .site-footer__columns {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
     }
     .site-footer--centered .site-footer__column-trigger {
       justify-content: center;
@@ -469,16 +491,6 @@
     },
     {
       "type": "link_list",
-      "id": "menu",
-      "label": "t:labels.menu"
-    },
-    {
-      "type": "link_list",
-      "id": "collections_menu",
-      "label": "t:labels.collections_menu"
-    },
-    {
-      "type": "link_list",
       "id": "legal_menu",
       "label": "t:labels.legal_menu",
       "info": "t:info.legal_menu"
@@ -489,13 +501,19 @@
     },
     {
       "type": "text",
+      "id": "contact_name",
+      "label": "t:labels.contact_name"
+    },
+    {
+      "type": "text",
       "id": "contact_email",
       "label": "t:labels.contact_email"
     },
     {
-      "type": "text",
+      "type": "richtext",
       "id": "contact_phone",
-      "label": "t:labels.contact_phone"
+      "label": "t:labels.contact_phone",
+      "info": "t:info.contact_phone"
     },
     {
       "type": "richtext",
@@ -595,6 +613,25 @@
       "label": "t:labels.enable_animations",
       "info": "t:info.enable_animations",
       "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "link-column",
+      "name": "t:general.link_column",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "t:labels.heading",
+          "default": "Explore"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "t:labels.menu"
+        }
+      ]
     }
   ]
 }

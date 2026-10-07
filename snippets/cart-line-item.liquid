@@ -1,8 +1,9 @@
 {% doc %}
-  Renders one line item row inside the cart drawer: thumbnail, title,
-  variant options, a quantity stepper, a remove button, and the line price.
-  Pure presentation — assets/component-cart-drawer.js owns the fetch calls
-  that quantity/remove buttons trigger.
+  Renders one line item row, shared by the cart drawer and the /cart page:
+  thumbnail, title, variant options, a quantity stepper, a remove button,
+  and the line price. Pure presentation — assets/component-cart-drawer.js
+  and assets/component-cart-page.js own the fetch calls that
+  quantity/remove buttons trigger.
 
   @param {object} line_item - A cart line item (from cart.items)
 
@@ -45,7 +46,12 @@
     </div>
   </div>
 
-  <p class="cart-line__price text-product-price">{{ line_item.final_line_price | money }}</p>
+  <p class="cart-line__price text-product-price">
+    {% if line_item.original_line_price > line_item.final_line_price %}
+      <s>{{ line_item.original_line_price | money }}</s>
+    {% endif %}
+    {{ line_item.final_line_price | money }}
+  </p>
 </div>
 
 {% stylesheet %}
@@ -55,6 +61,12 @@
     gap: var(--space-sm);
     padding-block: var(--space-md);
     border-bottom: 1px solid var(--color-line);
+    transition: opacity var(--duration-fast) var(--ease-signature);
+  }
+  /* Set by the cart drawer / cart page scripts while a change is in flight. */
+  .cart-line[aria-busy="true"] {
+    opacity: 0.5;
+    pointer-events: none;
   }
   .cart-line__image {
     width: 5rem;
@@ -85,29 +97,9 @@
     margin-top: var(--space-2xs);
   }
   .cart-line__price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
     white-space: nowrap;
-  }
-
-  .quantity-stepper {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-xs);
-    border: 1px solid var(--color-line);
-    border-radius: var(--style-border-radius-inputs, var(--radius-sm));
-    padding-inline: var(--space-2xs);
-  }
-  .quantity-stepper__button {
-    background: none;
-    border: none;
-    font-size: var(--font-size-body);
-    line-height: 1;
-    padding: var(--space-2xs);
-    cursor: pointer;
-    color: var(--color-foreground);
-  }
-  .quantity-stepper__value {
-    min-width: 1.5rem;
-    text-align: center;
-    font-variant-numeric: tabular-nums;
   }
 {% endstylesheet %}

@@ -15,6 +15,9 @@
  *    the first focusable element (e.g. the search overlay's input, rather
  *    than its close button which happens to sit first in the DOM)
  *  - Escape closes it; closing returns focus to whatever triggered the open
+ *  - scripts open it without a click by dispatching
+ *    `dialog:request-open` on `document` with `{ id }` as detail (e.g. the
+ *    product form opening the cart drawer after an add)
  */
 import { trapFocus, dispatch } from './utils.js';
 import { pauseSmoothScroll, resumeSmoothScroll } from './scroll.js';
@@ -63,11 +66,17 @@ export default function dialog(el) {
     if (event.target.closest('[data-dialog-close]')) close();
   }
 
+  function handleOpenRequest(event) {
+    if (event.detail && event.detail.id === el.id) open();
+  }
+
   document.addEventListener('click', handleTriggerClick);
+  document.addEventListener('dialog:request-open', handleOpenRequest);
   el.addEventListener('click', handleCloseClick);
 
   return () => {
     document.removeEventListener('click', handleTriggerClick);
+    document.removeEventListener('dialog:request-open', handleOpenRequest);
     document.removeEventListener('keydown', handleKeydown);
     el.removeEventListener('click', handleCloseClick);
     if (releaseFocusTrap) releaseFocusTrap();

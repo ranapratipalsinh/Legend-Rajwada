@@ -54,7 +54,10 @@
     "editorial_banner": "Editorial Campaign Banner",
     "contact": "Contact",
     "social_media": "Social media",
-    "legal": "Legal"
+    "legal": "Legal",
+    "link_column": "Link Column",
+    "testimonials": "Testimonials",
+    "testimonial": "Testimonial"
   },
   "labels": {
     "alignment": "Alignment",
@@ -145,7 +148,12 @@
     "social_facebook": "Facebook",
     "social_pinterest": "Pinterest",
     "social_x": "X",
-    "divider_style": "Divider style"
+    "divider_style": "Divider style",
+    "contact_name": "Contact person name",
+    "person_name": "Name",
+    "person_role": "Role or relationship",
+    "show_vendor": "Show vendor",
+    "show_dynamic_checkout": "Show dynamic checkout buttons"
   },
   "info": {
     "font_display": "Used for headlines, plate titles, and product names. Set sparingly.",
@@ -166,7 +174,9 @@
     "panel_layout": "Left/right split from tablet up; Centered overlays the text directly on the image at every size.",
     "legal_menu": "Optional. When empty, this automatically lists whichever legal policies you've filled in under Settings → Policies.",
     "footer_layout_style": "Grid presents every column side by side — the strongest choice when you're linking collections, policies, and contact details. Centered is a quieter, single-column colophon for a more minimal statement.",
-    "footer_social": "Only shown when filled in."
+    "footer_social": "Only shown when filled in.",
+    "contact_phone": "One number per line — add as many as you like. Use the editor's link tool to make any of them tap-to-call.",
+    "show_dynamic_checkout": "Adds a \"Buy it now\" button (and wallets such as PayPal, when enabled) so customers can skip the cart and go straight to checkout."
   },
   "options": {
     "alignment": {

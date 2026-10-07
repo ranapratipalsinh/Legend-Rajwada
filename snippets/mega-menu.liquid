@@ -77,7 +77,8 @@
 
   <div class="mega-menu__features">
     {% for block in section.blocks %}
-      {% if block.settings.menu_item_title != blank and block.settings.menu_item_title | downcase | strip == target_title %}
+      {% assign block_title = block.settings.menu_item_title | downcase | strip %}
+      {% if block_title != blank and block_title == target_title %}
         {% case block.type %}
           {% when 'mega-menu-collection' %}
             <a href="{{ block.settings.collection.url }}" class="mega-menu-feature" {{ block.shopify_attributes }}>

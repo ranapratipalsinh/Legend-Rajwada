@@ -35,16 +35,27 @@
   --space-section-md: calc(var(--space-scale, 1) * 6rem);  /* 96px  */
   --space-section-lg: calc(var(--space-scale, 1) * 10rem); /* 160px */
 
-  /* ---------- Radius — flat by default; softness is spent deliberately ---------- */
-  --radius-sm: 2px;
-  --radius-md: 4px;
+  /* ---------- Radius — almost square; vintage proportions read classic,
+     not app-soft. Pill stays full for badges/pagination, where a pill is
+     a structural shape, not a softness choice. ---------- */
+  --radius-sm: 1px;
+  --radius-md: 3px;
   --radius-pill: 999px;
 
-  /* ---------- Shadow — soft, low-opacity, never harsh ---------- */
-  --shadow-sm: 0 1px 2px rgba(20, 19, 17, 0.06);
-  --shadow-md: 0 8px 24px rgba(20, 19, 17, 0.10);
-  --shadow-lg: 0 24px 64px rgba(20, 19, 17, 0.16);
+  /* ---------- Shadow — a fixed near-black navy, not tied to --color-foreground.
+     The theme's ink color inverts between light/dark palettes; a shadow tinted
+     to whatever ink currently is would turn into a glow on a dark palette. ---------- */
+  --shadow-sm: 0 1px 2px rgba(6, 10, 20, 0.20);
+  --shadow-md: 0 4px 16px rgba(6, 10, 20, 0.28);
+  --shadow-lg: 0 12px 36px rgba(6, 10, 20, 0.36);
   --shadow-focus: 0 0 0 2px var(--color-background), 0 0 0 4px var(--color-accent);
+
+  /* ---------- Scrim — a fixed dark tone for legibility overlays on top of
+     photography (hero/campaign panels). Deliberately independent of
+     --color-foreground: that token now inverts between palettes (dark ink
+     on a light canvas, or light ink on a dark canvas), but an image scrim
+     always needs to go dark-over-photo regardless of which palette is active. */
+  --color-scrim: #0b0f1a;
 
   /* ---------- Motion ---------- */
   --ease-signature: cubic-bezier(0.65, 0, 0.35, 1);

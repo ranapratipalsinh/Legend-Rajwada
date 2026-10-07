@@ -13,8 +13,24 @@
   "sections": {
     "footer": {
       "type": "footer",
+      "blocks": {
+        "link-column-1": {
+          "type": "link-column",
+          "settings": {
+            "heading": "Explore",
+            "menu": "main-menu"
+          }
+        },
+        "link-column-2": {
+          "type": "link-column",
+          "settings": {
+            "heading": "Collections",
+            "menu": ""
+          }
+        }
+      },
+      "block_order": ["link-column-1", "link-column-2"],
       "settings": {
-        "menu": "",
         "show_payment_icons": true
       }
     }

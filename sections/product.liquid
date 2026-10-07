@@ -1,50 +1,401 @@
 {% comment %}
-  This section is used in the product template to render product page with
-  media, content, and add-to-cart form.
+  Main product section — media gallery, price, option pickers (size, colour,
+  …), quantity stepper and add-to-cart. Option buttons, price, sale state
+  and button label are all server-rendered for the initially selected
+  variant; assets/component-product-form.js keeps them in sync as a
+  customer changes options, reading every variant from the JSON block
+  below rather than re-fetching the section. Add-to-cart opens the cart
+  drawer instead of redirecting to /cart.
 
   https://shopify.dev/docs/storefronts/themes/architecture/templates/product
 {% endcomment %}
 
-<div class="product-images">
-  {% for image in product.images %}
-    {% render 'image', class: 'product-image', image: image %}
-  {% endfor %}
-</div>
+{% liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign on_sale = false
+  if current_variant.compare_at_price > current_variant.price
+    assign on_sale = true
+  endif
+%}
 
-<div class="product-info">
-  <h1>{{ product.title }}</h1>
-  <p>{{ product.price | money }}</p>
-  <p>{{ product.description }}</p>
-</div>
-
-<div class="product-form">
-  {% form 'product', product %}
-    {% assign current_variant = product.selected_or_first_available_variant %}
-
-    <select name="id">
-      {% for variant in product.variants %}
-        <option
-          value="{{ variant.id }}"
-          {% if variant == current_variant %}
-            selected="selected"
+<section
+  class="product"
+  data-component="product-form"
+  data-label-add="{{ 'products.add_to_cart' | t | escape }}"
+  data-label-sold-out="{{ 'products.sold_out' | t | escape }}"
+  data-label-unavailable="{{ 'products.unavailable' | t | escape }}"
+  data-error-generic="{{ 'products.error_generic' | t | escape }}"
+  style="--product-spacing: var(--space-section-{{ section.settings.spacing }});"
+>
+  <div class="product__media" data-product-gallery>
+    {% for media in product.media %}
+      <div class="product__media-item" data-media-id="{{ media.id }}">
+        {% if media.media_type == 'image' %}
+          {% if forloop.first %}
+            {% render 'image', image: media.preview_image, class: 'product__image', width: 1500, loading: 'eager', fetchpriority: 'high' %}
+          {% else %}
+            {% render 'image', image: media.preview_image, class: 'product__image', width: 1500 %}
           {% endif %}
+        {% else %}
+          {{ media | media_tag: image_size: '1500x' }}
+        {% endif %}
+      </div>
+    {% else %}
+      <div class="product__media-item">
+        {{ 'product-1' | placeholder_svg_tag: 'product__placeholder' }}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="product__info">
+    <div class="product__heading">
+      {% if section.settings.show_vendor and product.vendor != blank %}
+        <p class="text-eyebrow">{{ product.vendor }}</p>
+      {% endif %}
+      <h1 class="product__title text-h3">{{ product.title }}</h1>
+
+      <div class="product__price">
+        <span class="text-product-price" data-price-current>{{ current_variant.price | money }}</span>
+        <s class="product__price-compare" data-price-compare {% unless on_sale %}hidden{% endunless %}>
+          {%- if on_sale %}{{ current_variant.compare_at_price | money }}{% endif -%}
+        </s>
+        <span class="badge badge--sale" data-sale-badge {% unless on_sale %}hidden{% endunless %}>
+          {{- 'products.sale' | t -}}
+        </span>
+      </div>
+
+      <p class="product__tax-note text-caption">
+        {%- if cart.taxes_included -%}
+          {{ 'general.taxes_included' | t }}
+        {%- else -%}
+          {{ 'general.taxes_excluded' | t }}
+        {%- endif -%}
+      </p>
+    </div>
+
+    {% form 'product', product, class: 'product__form', novalidate: 'novalidate' %}
+      <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-id>
+
+      {% unless product.has_only_default_variant %}
+        <div class="product__options">
+          {% for option in product.options_with_values %}
+            {% assign option_index = forloop.index0 %}
+            <fieldset class="product-option" data-option-index="{{ option_index }}">
+              <legend class="product-option__legend text-form-label">
+                {{ option.name }}:
+                <span class="product-option__selected" data-option-selected>{{ option.selected_value }}</span>
+              </legend>
+              <div class="product-option__values">
+                {% for value in option.values %}
+                  {% assign input_id = section.id | append: '-option-' | append: option_index | append: '-' | append: forloop.index0 %}
+                  <input
+                    type="radio"
+                    class="product-option__input visually-hidden"
+                    id="{{ input_id }}"
+                    name="{{ section.id }}-option-{{ option_index }}"
+                    value="{{ value.name | escape }}"
+                    {% if value.selected %}
+                      checked
+                    {% endif %}
+                  >
+                  <label
+                    for="{{ input_id }}"
+                    class="product-option__label{% unless value.available %} is-unavailable{% endunless %}"
+                  >
+                    {{ value.name }}
+                    <span class="visually-hidden" data-unavailable-note {% if value.available %}hidden{% endif %}>
+                      {{- 'products.sold_out' | t -}}
+                    </span>
+                  </label>
+                {% endfor %}
+              </div>
+            </fieldset>
+          {% endfor %}
+        </div>
+      {% endunless %}
+
+      <div class="product__quantity">
+        <label class="text-form-label" for="Quantity-{{ section.id }}">{{ 'products.quantity' | t }}</label>
+        <div class="quantity-stepper">
+          <button
+            type="button"
+            class="quantity-stepper__button"
+            data-quantity-decrease
+            aria-label="{{ 'products.decrease_quantity' | t | escape }}"
+          >&minus;</button>
+          <input
+            type="number"
+            id="Quantity-{{ section.id }}"
+            name="quantity"
+            class="quantity-stepper__value quantity-stepper__input"
+            value="1"
+            min="1"
+            inputmode="numeric"
+            data-quantity-input
+          >
+          <button
+            type="button"
+            class="quantity-stepper__button"
+            data-quantity-increase
+            aria-label="{{ 'products.increase_quantity' | t | escape }}"
+          >+</button>
+        </div>
+      </div>
+
+      <p class="field__message field__message--error" data-product-error role="alert" hidden></p>
+
+      <div class="product__buttons">
+        <button
+          type="submit"
+          name="add"
+          class="btn btn--primary product__add"
+          data-add-to-cart
+          {% unless current_variant.available %}
+            disabled
+          {% endunless %}
         >
-          {{ variant.title }} - {{ variant.price | money }}
-        </option>
-      {% endfor %}
-    </select>
+          {%- if current_variant.available -%}
+            {{ 'products.add_to_cart' | t }}
+          {%- else -%}
+            {{ 'products.sold_out' | t }}
+          {%- endif -%}
+        </button>
 
-    <input type="text" name="quantity" min="1" value="1">
+        {% if section.settings.show_dynamic_checkout %}
+          {{ form | payment_button }}
+        {% endif %}
+      </div>
+    {% endform %}
 
-    <input type="submit" value="Add to cart">
-    {{ form | payment_button }}
-  {% endform %}
-</div>
+    {% if product.description != blank %}
+      <div class="product__description rte text-body">{{ product.description }}</div>
+    {% endif %}
+  </div>
+
+  <script type="application/json" data-product-variants>
+    [
+      {%- for variant in product.variants -%}
+        {
+          "id": {{ variant.id }},
+          "options": {{ variant.options | json }},
+          "available": {{ variant.available | json }},
+          "price": {{ variant.price | money | json }},
+          "compare_at_price": {% if variant.compare_at_price > variant.price %}{{ variant.compare_at_price | money | json }}{% else %}null{% endif %},
+          "featured_media_id": {{ variant.featured_media.id | json }}
+        }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ]
+  </script>
+
+  <script type="application/ld+json">
+    {{ product | structured_data }}
+  </script>
+</section>
+
+{% stylesheet %}
+  .product {
+    display: grid;
+    gap: var(--space-lg);
+    padding-block: var(--product-spacing, var(--space-section-sm));
+  }
+
+  /* ---------- Gallery — a swipeable strip on mobile, a stacked column from
+     desktop up. position: relative makes the strip each item's offsetParent,
+     which component-product-form.js relies on to scroll to a variant's image. ---------- */
+  .product__media {
+    position: relative;
+    display: flex;
+    gap: var(--space-2xs);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .product__media::-webkit-scrollbar {
+    display: none;
+  }
+  .product__media-item {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    background-color: var(--color-surface);
+  }
+  .product__media-item :is(img, video, iframe, model-viewer),
+  .product__placeholder {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* ---------- Info column ---------- */
+  .product__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+  .product__heading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+  .product__price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+  .product__price-compare,
+  .product__tax-note {
+    color: var(--color-foreground-soft);
+  }
+  .product__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  .product__options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  /* ---------- Option buttons (size, colour, …) ---------- */
+  .product-option {
+    border: none;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+  .product-option__legend {
+    padding: 0;
+    margin-bottom: var(--space-xs);
+  }
+  .product-option__selected {
+    color: var(--color-foreground);
+  }
+  .product-option__values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+  }
+  .product-option__label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 3rem;
+    min-height: 2.75rem; /* accessible tap target */
+    padding-inline: var(--space-sm);
+    border: 1px solid var(--color-line);
+    border-radius: var(--style-border-radius-inputs, var(--radius-sm));
+    font-size: var(--font-size-small);
+    cursor: pointer;
+    transition:
+      border-color var(--duration-fast) var(--ease-signature),
+      background-color var(--duration-fast) var(--ease-signature),
+      color var(--duration-fast) var(--ease-signature);
+  }
+  .product-option__label:hover {
+    border-color: var(--color-foreground);
+  }
+  .product-option__label.is-unavailable {
+    color: var(--color-foreground-soft);
+    border-style: dashed;
+    text-decoration: line-through;
+  }
+  .product-option__input:checked + .product-option__label {
+    background-color: var(--color-foreground);
+    border-color: var(--color-foreground);
+    color: var(--color-background);
+  }
+  .product-option__input:focus-visible + .product-option__label {
+    box-shadow: var(--shadow-focus);
+  }
+
+  /* ---------- Quantity — reuses .quantity-stepper from
+     snippets/cart-line-item.liquid, with a real input in the middle. ---------- */
+  .product__quantity {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2xs);
+  }
+  .quantity-stepper__input {
+    width: 3rem;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
+    -moz-appearance: textfield;
+  }
+  .quantity-stepper__input::-webkit-inner-spin-button,
+  .quantity-stepper__input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .quantity-stepper__input:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+  }
+
+  .product__buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+  .product__add {
+    width: 100%;
+  }
+
+  /* ---------- Desktop (990px+) — gallery and info side by side, info
+     stays in view while the gallery scrolls past. ---------- */
+  @media (min-width: 990px) {
+    .product {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: var(--space-2xl);
+      align-items: start;
+    }
+    .product__media {
+      flex-direction: column;
+      overflow: visible;
+      scroll-snap-type: none;
+    }
+    .product__media-item {
+      flex: none;
+    }
+    .product__info {
+      position: sticky;
+      top: var(--space-xl);
+    }
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
   "name": "t:general.product",
-  "settings": [],
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "t:labels.show_vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dynamic_checkout",
+      "label": "t:labels.show_dynamic_checkout",
+      "info": "t:info.show_dynamic_checkout",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "spacing",
+      "label": "t:labels.padding",
+      "options": [
+        { "value": "sm", "label": "t:options.size.small" },
+        { "value": "md", "label": "t:options.size.medium" },
+        { "value": "lg", "label": "t:options.size.large" }
+      ],
+      "default": "sm"
+    }
+  ],
   "disabled_on": {
     "groups": ["header", "footer"]
   }

@@ -17,7 +17,19 @@
       "label": "Breadcrumb"
     },
     "menu_title": "Menu",
-    "explore_collection": "Explore the Collection"
+    "explore_collection": "Explore the Collection",
+    "taxes_included": "Taxes included. Shipping calculated at checkout.",
+    "taxes_excluded": "Taxes and shipping calculated at checkout."
+  },
+  "products": {
+    "add_to_cart": "Add to cart",
+    "sold_out": "Sold out",
+    "unavailable": "Unavailable",
+    "sale": "Sale",
+    "quantity": "Quantity",
+    "decrease_quantity": "Decrease quantity",
+    "increase_quantity": "Increase quantity",
+    "error_generic": "Couldn't add this to your cart. Please try again."
   },
   "header": {
     "search": "Search",
@@ -38,6 +50,10 @@
   },
   "quick_view": {
     "title": "Quick view"
+  },
+  "testimonials": {
+    "previous": "Previous testimonial",
+    "next": "Next testimonial"
   },
   "hero": {
     "scroll_hint": "Scroll to explore"
@@ -69,7 +85,13 @@
     "continue_shopping": "Continue shopping",
     "empty_title": "Your cart is empty",
     "empty_message": "Looks like you haven't added anything yet.",
-    "view_details": "View details"
+    "view_details": "View details",
+    "summary": "Order summary",
+    "item_count": {
+      "one": "{{ count }} item",
+      "other": "{{ count }} items"
+    },
+    "error_generic": "Couldn't update your cart. Please try again."
   },
   "customers": {
     "login": {

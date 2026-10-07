@@ -1,37 +1,184 @@
 {% comment %}
-  This section is used in the cart template to render /cart page with an
-  overview of the items in customer's cart.
+  The /cart page. Line items reuse snippets/cart-line-item.liquid — the same
+  row the cart drawer renders — so both carts always look and behave alike.
+  assets/component-cart-page.js handles quantity/remove, re-rendering only
+  the [data-cart-swap] regions of this section via Shopify's Section
+  Rendering API, so the dynamic checkout buttons (initialised once by
+  Shopify's own script) are never replaced mid-session.
 
   https://shopify.dev/docs/storefronts/themes/architecture/templates/cart
 {% endcomment %}
 
-<h1>{{ 'cart.title' | t }}</h1>
+{% liquid
+  assign continue_shopping_label = 'cart.continue_shopping' | t
+%}
 
-<form action="{{ routes.cart_url }}" method="post">
-  <table>
-    {% for item in cart.items %}
-      <tr>
-        <td>
-          {% render 'image', image: item.image, url: item.url %}
-        </td>
-        <td>
-          <p>{{ item.product.title }}</p>
-          {{ 'cart.remove' | t | link_to: item.url_to_remove }}
-        </td>
-        <td>
-          <input type="text" name="updates[]" value="{{ item.quantity }}">
-          <input type="submit" value="{{ 'cart.update' | t }}">
-        </td>
-      </tr>
-    {% endfor %}
-  </table>
+<div
+  class="cart-page"
+  data-component="cart-page"
+  data-section-id="{{ section.id }}"
+  data-error-generic="{{ 'cart.error_generic' | t | escape }}"
+  style="--cart-page-spacing: var(--space-section-{{ section.settings.spacing }});"
+>
+  <div data-cart-swap="body">
+    {% if cart.item_count == 0 %}
+      <div class="cart-page__empty">
+        <h1 class="text-h3">{{ 'cart.empty_title' | t }}</h1>
+        <p class="text-body">{{ 'cart.empty_message' | t }}</p>
+        {% render 'button', text: continue_shopping_label, url: routes.root_url, style: 'primary' %}
+      </div>
+    {% else %}
+      <header class="cart-page__header" data-cart-swap="header">
+        <h1 class="text-h3">{{ 'cart.title' | t }}</h1>
+        <p class="cart-page__count text-caption">{{ 'cart.item_count' | t: count: cart.item_count }}</p>
+      </header>
 
-  <input type="submit" name="checkout" value="{{ 'cart.checkout' | t }}">
-</form>
+      <form action="{{ routes.cart_url }}" method="post" class="cart-page__layout">
+        <div class="cart-page__lines" data-cart-swap="lines">
+          {% for line_item in cart.items %}
+            {% render 'cart-line-item', line_item: line_item %}
+          {% endfor %}
+        </div>
+
+        <aside class="cart-page__summary" aria-labelledby="CartSummary-{{ section.id }}">
+          <h2 id="CartSummary-{{ section.id }}" class="text-h6">{{ 'cart.summary' | t }}</h2>
+
+          <div class="cart-page__totals" data-cart-swap="totals">
+            {% for discount in cart.cart_level_discount_applications %}
+              <div class="cart-page__row cart-page__discount text-body">
+                <span>{{ discount.title }}</span>
+                <span>-{{ discount.total_allocated_amount | money }}</span>
+              </div>
+            {% endfor %}
+            <div class="cart-page__row">
+              <span class="text-body-lg">{{ 'cart.subtotal' | t }}</span>
+              <span class="text-product-price">{{ cart.total_price | money }}</span>
+            </div>
+            <p class="cart-page__note text-caption">
+              {%- if cart.taxes_included -%}
+                {{ 'general.taxes_included' | t }}
+              {%- else -%}
+                {{ 'general.taxes_excluded' | t }}
+              {%- endif -%}
+            </p>
+          </div>
+
+          <p class="field__message field__message--error" data-cart-error role="alert" hidden></p>
+
+          <button type="submit" name="checkout" class="btn btn--primary cart-page__checkout">
+            {{- 'cart.checkout' | t -}}
+          </button>
+
+          {% if additional_checkout_buttons %}
+            <div class="cart-page__dynamic-checkout">{{ content_for_additional_checkout_buttons }}</div>
+          {% endif %}
+
+          {% render 'button', text: continue_shopping_label, url: routes.root_url, style: 'text', class: 'cart-page__continue' %}
+        </aside>
+      </form>
+    {% endif %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .cart-page {
+    padding-block: var(--cart-page-spacing, var(--space-section-sm));
+  }
+
+  .cart-page__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-sm);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--color-line);
+  }
+  .cart-page__count {
+    color: var(--color-foreground-soft);
+  }
+
+  .cart-page__layout {
+    display: grid;
+    gap: var(--space-xl);
+  }
+
+  /* Roomier rows than the drawer — same snippet, wider page. */
+  .cart-page .cart-line {
+    grid-template-columns: 6rem 1fr auto;
+  }
+  .cart-page .cart-line__image {
+    width: 6rem;
+  }
+
+  .cart-page__summary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    background-color: var(--color-surface);
+    border-radius: var(--radius-md);
+  }
+  .cart-page__totals {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+  .cart-page__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-sm);
+  }
+  .cart-page__discount {
+    color: var(--color-signal-success);
+  }
+  .cart-page__note {
+    color: var(--color-foreground-soft);
+  }
+  .cart-page__checkout {
+    width: 100%;
+  }
+  .cart-page__continue {
+    align-self: center;
+  }
+
+  .cart-page__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    padding-block: var(--space-xl);
+  }
+
+  /* ---------- Desktop (990px+) — summary beside the lines, kept in view. ---------- */
+  @media (min-width: 990px) {
+    .cart-page__layout {
+      grid-template-columns: minmax(0, 1fr) 22rem;
+      align-items: start;
+    }
+    .cart-page__summary {
+      position: sticky;
+      top: var(--space-xl);
+      margin-top: var(--space-md);
+    }
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
   "name": "t:general.cart",
-  "settings": []
+  "settings": [
+    {
+      "type": "select",
+      "id": "spacing",
+      "label": "t:labels.padding",
+      "options": [
+        { "value": "sm", "label": "t:options.size.small" },
+        { "value": "md", "label": "t:options.size.medium" },
+        { "value": "lg", "label": "t:options.size.large" }
+      ],
+      "default": "sm"
+    }
+  ]
 }
 {% endschema %}

@@ -1,0 +1,289 @@
+{% comment %}
+  An original testimonials/clientele section — a large decorative quote
+  mark, italic display-serif quotes, and a simple attribution row (name +
+  optional role + optional photo). Ships as a native horizontal
+  scroll-snap row by default (works with zero JavaScript); when Swiper is
+  available it's progressively enhanced into a proper carousel with
+  pagination dots and prev/next controls. Each testimonial is its own
+  repeatable block, so a merchant supplies their own real quotes, names,
+  and photos — nothing here is pre-filled with anyone else's likeness.
+{% endcomment %}
+
+{% liquid
+  assign animations_enabled = section.settings.enable_animations
+  assign previous_label = 'testimonials.previous' | t
+  assign next_label = 'testimonials.next' | t
+%}
+
+<section
+  class="testimonials"
+  data-component="testimonials"
+  data-animations="{{ animations_enabled }}"
+  style="
+    --testimonials-spacing: var(--space-section-{{ section.settings.spacing }});
+    {%- if section.settings.background_color %}--testimonials-background: {{ section.settings.background_color }};{% endif %}
+  "
+>
+  {% if section.settings.eyebrow != blank or section.settings.heading != blank or section.settings.subheading != blank %}
+    <header class="testimonials__intro">
+      {% if section.settings.eyebrow != blank %}
+        <p class="text-eyebrow" data-reveal="up">{{ section.settings.eyebrow }}</p>
+      {% endif %}
+      {% if section.settings.heading != blank %}
+        <h2 class="text-display" data-reveal-text>{{ section.settings.heading }}</h2>
+      {% endif %}
+      {% if section.settings.subheading != blank %}
+        <p class="testimonials__subheading text-subtitle" data-reveal="up">{{ section.settings.subheading }}</p>
+      {% endif %}
+    </header>
+  {% endif %}
+
+  {% if section.blocks.size > 0 %}
+    <div class="testimonials__carousel">
+      <div class="testimonials__track swiper">
+        <div class="swiper-wrapper">
+          {% for block in section.blocks %}
+            {% if block.type == 'testimonial' %}
+              <div class="swiper-slide testimonial-card" {{ block.shopify_attributes }}>
+                <span class="testimonial-card__mark" aria-hidden="true">&#8220;</span>
+                {% if block.settings.quote != blank %}
+                  <blockquote class="testimonial-card__quote text-h6">{{ block.settings.quote }}</blockquote>
+                {% endif %}
+                <div class="testimonial-card__attribution">
+                  {% if block.settings.photo %}
+                    {% render 'image', image: block.settings.photo, class: 'testimonial-card__photo ratio-square' %}
+                  {% endif %}
+                  <div class="testimonial-card__identity">
+                    {% if block.settings.name != blank %}
+                      <p class="testimonial-card__name text-body-lg">{{ block.settings.name }}</p>
+                    {% endif %}
+                    {% if block.settings.role != blank %}
+                      <p class="testimonial-card__role text-caption">{{ block.settings.role }}</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+
+      {% if section.blocks.size > 1 %}
+        <div class="testimonials__controls">
+          <button type="button" class="btn btn--icon testimonials__nav testimonials__nav--prev" aria-label="{{ previous_label }}">
+            {% render 'icon', name: 'arrow-up' %}
+          </button>
+          <div class="testimonials__pagination"></div>
+          <button type="button" class="btn btn--icon testimonials__nav testimonials__nav--next" aria-label="{{ next_label }}">
+            {% render 'icon', name: 'arrow-up' %}
+          </button>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+
+{% stylesheet %}
+  .testimonials {
+    background-color: var(--testimonials-background, var(--color-background));
+    padding-block: var(--testimonials-spacing, var(--space-section-md));
+  }
+
+  .testimonials__intro {
+    max-width: 36rem;
+    margin: 0 auto var(--space-2xl);
+    padding-inline: var(--page-margin);
+    text-align: center;
+  }
+  .testimonials__subheading {
+    margin-top: var(--space-sm);
+  }
+
+  .testimonials__carousel {
+    position: relative;
+  }
+
+  /* Native fallback: a horizontally scrollable, snapping row. Swiper takes
+     over this same markup when it's available (see component-testimonials.js)
+     — the section is fully usable either way. */
+  .testimonials__track {
+    overflow: hidden;
+  }
+  .swiper-wrapper {
+    display: flex;
+    gap: var(--space-lg);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-inline: var(--page-margin);
+    list-style: none;
+    margin: 0;
+  }
+
+  .testimonial-card {
+    position: relative;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    width: min(28rem, 85vw);
+    padding: var(--space-xl);
+    border: 1px solid var(--color-line);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+  .testimonial-card__mark {
+    position: absolute;
+    top: var(--space-sm);
+    left: var(--space-md);
+    font-family: var(--font-display--family);
+    font-size: 4rem;
+    line-height: 1;
+    color: var(--color-accent-soft);
+    z-index: 0;
+  }
+  .testimonial-card__quote {
+    position: relative;
+    font-family: var(--font-display--family);
+    font-style: italic;
+    font-weight: normal;
+    z-index: 1;
+  }
+  .testimonial-card__attribution {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+  .testimonial-card__photo {
+    width: 3rem;
+    flex-shrink: 0;
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+  }
+  .testimonial-card__photo.image > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .testimonial-card__name {
+    color: var(--color-foreground);
+  }
+  .testimonial-card__role {
+    color: var(--color-foreground-soft);
+  }
+
+  .testimonials__controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
+  }
+  .testimonials__nav--prev svg { transform: rotate(-90deg); }
+  .testimonials__nav--next svg { transform: rotate(90deg); }
+  .testimonials__pagination {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+  }
+  .testimonials__pagination .swiper-pagination-bullet {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-pill);
+    background: var(--color-line);
+    opacity: 1;
+    cursor: pointer;
+  }
+  .testimonials__pagination .swiper-pagination-bullet-active {
+    background: var(--color-accent);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.testimonials",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:labels.eyebrow",
+      "default": "In Their Own Words"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.headline",
+      "default": "The Legend Circle"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheadline",
+      "default": "The families and patrons who trust Legend Rajwada with their most defining days."
+    },
+    {
+      "type": "select",
+      "id": "spacing",
+      "label": "t:labels.padding",
+      "options": [
+        { "value": "sm", "label": "t:options.size.small" },
+        { "value": "md", "label": "t:options.size.medium" },
+        { "value": "lg", "label": "t:options.size.large" }
+      ],
+      "default": "md"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "t:labels.background"
+    },
+    {
+      "type": "header",
+      "content": "t:general.motion"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_animations",
+      "label": "t:labels.enable_animations",
+      "info": "t:info.enable_animations",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "t:general.testimonial",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "quote",
+          "label": "t:labels.quote"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "t:labels.person_name"
+        },
+        {
+          "type": "text",
+          "id": "role",
+          "label": "t:labels.person_role"
+        },
+        {
+          "type": "image_picker",
+          "id": "photo",
+          "label": "t:labels.image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.testimonials",
+      "blocks": [
+        { "type": "testimonial" },
+        { "type": "testimonial" },
+        { "type": "testimonial" }
+      ]
+    }
+  ]
+}
+{% endschema %}

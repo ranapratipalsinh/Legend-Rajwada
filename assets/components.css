@@ -56,6 +56,32 @@
   color: var(--color-background);
 }
 
+/* ---------- Quantity stepper ----------
+   Shared by the cart line rows (snippets/cart-line-item.liquid, a <span>
+   value) and the product form (sections/product.liquid, an <input> value). */
+.quantity-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  border: 1px solid var(--color-line);
+  border-radius: var(--style-border-radius-inputs, var(--radius-sm));
+  padding-inline: var(--space-2xs);
+}
+.quantity-stepper__button {
+  background: none;
+  border: none;
+  font-size: var(--font-size-body);
+  line-height: 1;
+  padding: var(--space-2xs);
+  cursor: pointer;
+  color: var(--color-foreground);
+}
+.quantity-stepper__value {
+  min-width: 1.5rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
 /* ---------- Divider ---------- */
 .divider {
   border: none;

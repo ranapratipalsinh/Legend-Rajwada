@@ -131,7 +131,13 @@
   .site-header {
     --header-background: var(--color-background);
     --header-text-color: var(--color-foreground);
-    --header-text-color-transparent: var(--color-background);
+    /* Not --color-background: that token inverts between light/dark
+       palettes. A header floating over arbitrary photography always needs
+       a light, legible tone, regardless of which palette is active — the
+       theme's ink color happens to be that light tone under the current
+       (dark-canvas) palette. Revisit if the theme ever needs to support
+       both directions simultaneously. */
+    --header-text-color-transparent: var(--color-foreground);
     --header-border-color: var(--color-line);
     --header-border-width: 1px;
 
