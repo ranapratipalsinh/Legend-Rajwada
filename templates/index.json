@@ -27,9 +27,54 @@
         "cta_style": "primary",
         "enable_animations": true
       }
+    },
+    "signature_collection": {
+      "type": "signature-collection",
+      "blocks": {
+        "panel_long_coat": {
+          "type": "collection-panel",
+          "settings": {
+            "collection": "the-indian-long-coat",
+            "layout": "left"
+          }
+        },
+        "panel_sherwani": {
+          "type": "collection-panel",
+          "settings": {
+            "collection": "sherwani",
+            "layout": "right"
+          }
+        },
+        "panel_achkan": {
+          "type": "collection-panel",
+          "settings": {
+            "collection": "achkan",
+            "layout": "center"
+          }
+        }
+      },
+      "block_order": [
+        "panel_long_coat",
+        "panel_sherwani",
+        "panel_achkan"
+      ],
+      "settings": {}
+    },
+    "brand_story": {
+      "type": "brand-story",
+      "settings": {}
+    },
+    "editorial_banner": {
+      "type": "editorial-banner",
+      "settings": {
+        "cta_link": "shopify://collections/all"
+      }
     }
   },
   "order": [
-    "hero"
+    "hero",
+    "signature_collection",
+    "brand_story",
+    "editorial_banner"
   ]
 }

@@ -87,6 +87,15 @@
                   >
                 </picture>
               </div>
+            {% else %}
+              {%- comment -%}
+                No block image and the collection has no image or products
+                yet — a placeholder keeps the panel from rendering as an
+                empty dark block until the merchant adds one.
+              {%- endcomment -%}
+              <div class="collection-panel__image-wrap">
+                {{ 'collection-1' | placeholder_svg_tag: 'collection-panel__image collection-panel__placeholder' }}
+              </div>
             {% endif %}
 
             {% if block.settings.video %}
@@ -185,6 +194,10 @@
   .collection-panel__image-wrap {
     position: absolute;
     inset: 0;
+  }
+  .collection-panel__placeholder {
+    background-color: var(--color-surface);
+    fill: var(--color-line);
   }
   @media (prefers-reduced-motion: reduce) {
     .collection-panel__video-wrap { display: none; }

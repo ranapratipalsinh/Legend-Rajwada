@@ -1,14 +1,12 @@
 /**
  * Smooth-scroll capability, powered by Lenis.
  *
- * Lenis itself is NOT vendored in this repo. Add it by downloading the
- * package build and saving it — unmodified — as assets/vendor-lenis.js
- * (e.g. `node_modules/lenis/dist/lenis.min.js`, which attaches `window.Lenis`).
- * Shopify's assets/ directory does not support subfolders, so the flat name
- * is intentional, not a shortcut.
+ * Lenis is vendored, unmodified, as assets/vendor-lenis.js (the package's
+ * `dist/lenis.min.js`, which attaches `window.Lenis`). Shopify's assets/
+ * directory does not support subfolders, so the flat name is intentional,
+ * not a shortcut.
  *
- * Nothing calls initSmoothScroll() yet — that happens once a real layout
- * exists to test it against. This file only defines the capability.
+ * Called once from assets/theme.js on boot.
  */
 import { loadScript } from './utils.js';
 import { isMotionEnabled } from './motion-preference.js';

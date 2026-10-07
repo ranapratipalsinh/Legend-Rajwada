@@ -83,16 +83,9 @@
     {%- comment -%}
       Vendor asset map for on-demand loading (see assets/scroll.js,
       assets/motion.js, assets/carousel.js). Populated with asset_url so the
-      CDN-hashed paths are correct; the files themselves must be vendored in
-      by hand — see each module's header comment.
-    {%- endcomment -%}
-    {%- # theme-check-disable MissingAsset -%}
-    {%- comment -%}
-      These five files are not part of this build — see the header comment
-      in each of assets/scroll.js, assets/motion.js and assets/carousel.js
-      for the exact package + filename to vendor in before shipping.
-      MissingAsset is disabled for this block only, deliberately, rather
-      than theme-wide.
+      CDN-hashed paths are correct. The vendor-*.js/.css files are the
+      official, unmodified builds (lenis 1.3.26, gsap 3.15.0, swiper 14.3.0)
+      — replace them with newer builds of the same packages to upgrade.
     {%- endcomment -%}
     <script>
       window.theme = window.theme || {};
@@ -108,7 +101,6 @@
       };
       window.theme.moneyFormat = {{ shop.money_format | json }};
     </script>
-    {%- # theme-check-enable MissingAsset -%}
     <script type="module" src="{{ 'theme.js' | asset_url }}"></script>
 
     {%- comment -%}

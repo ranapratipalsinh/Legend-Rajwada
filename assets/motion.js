@@ -10,13 +10,10 @@
  *    (scrubbed timelines, pinning). Only loaded the first time a component
  *    actually calls one of them.
  *
- * GSAP itself is NOT vendored in this repo — add the real, unmodified
- * builds as assets/vendor-gsap.js (window.gsap) and
- * assets/vendor-gsap-scrolltrigger.js (window.ScrollTrigger), downloaded
- * from the official gsap package. Nothing in this file invents that code.
- *
- * No component calls any of this yet — it is a capability layer, ready for
- * the sections built in a later phase to opt into.
+ * GSAP is vendored as the real, unmodified builds from the official gsap
+ * package: assets/vendor-gsap.js (window.gsap) and
+ * assets/vendor-gsap-scrolltrigger.js (window.ScrollTrigger). Nothing in
+ * this file invents that code.
  */
 import { loadScript } from './utils.js';
 import { isMotionEnabled } from './motion-preference.js';

@@ -1,14 +1,10 @@
 /**
  * Carousel capability, powered by Swiper.
  *
- * Swiper is NOT vendored in this repo. Add the official build, unmodified,
- * as assets/vendor-swiper.js (window.Swiper) and assets/vendor-swiper.css
- * (downloaded from the swiper package's `swiper-bundle.min.js` /
- * `swiper-bundle.min.css`). Loaded on demand — a page with no carousel on
+ * Swiper is vendored, unmodified, as assets/vendor-swiper.js (window.Swiper)
+ * and assets/vendor-swiper.css (the swiper package's `swiper-bundle.min.js`
+ * / `swiper-bundle.min.css`). Loaded on demand — a page with no carousel on
  * it never pays for Swiper's weight.
- *
- * No section calls this yet; it is the capability a future product-gallery
- * or lookbook-slider section will call with `initCarousel(el, options)`.
  */
 import { loadScript, loadStyle } from './utils.js';
 import { isMotionEnabled } from './motion-preference.js';
