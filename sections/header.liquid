@@ -172,8 +172,11 @@
     border-bottom-color: var(--header-border-color);
   }
 
+  /* min-height, not height: if a merchant adds more top-level menu items
+     than fit on one line, .nav__list wraps to a second row and the header
+     grows to hold it instead of the links spilling over the icons. */
   .site-header__inner {
-    height: var(--header-height);
+    min-height: var(--header-height);
     display: flex;
     align-items: center;
     gap: var(--space-xl);
@@ -205,11 +208,19 @@
 
   .nav__list {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: inherit;
     align-items: center;
-    gap: var(--space-lg);
+    column-gap: var(--space-md);
+    row-gap: 0;
     list-style: none;
     margin: 0;
     padding: 0;
+  }
+  @media (min-width: 1200px) {
+    .nav__list {
+      column-gap: var(--space-lg);
+    }
   }
   .nav__link {
     display: inline-flex;
@@ -225,17 +236,19 @@
     text-decoration: none;
     cursor: pointer;
     padding-block: var(--space-sm);
+    white-space: nowrap;
   }
-  .nav__item {
-    position: relative;
-  }
+  /* The dropdown is anchored to the whole header (the nearest positioned
+     ancestor), not to its own menu item — a panel centred under an item
+     near either edge, or one with many columns, used to run off-screen. */
   .mega-menu {
     display: none;
     position: absolute;
     top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    min-width: max-content;
+    left: var(--page-margin);
+    right: var(--page-margin);
+    max-height: calc(100vh - var(--header-height) - var(--space-lg));
+    overflow-y: auto;
     background-color: var(--color-background);
     color: var(--color-foreground);
     border: 1px solid var(--color-line);

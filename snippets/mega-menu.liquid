@@ -122,20 +122,26 @@
   }
   .mega-menu__columns {
     display: flex;
-    gap: var(--space-2xl);
+    flex-wrap: wrap;
+    gap: var(--space-xl) var(--space-2xl);
     flex: 1;
+    min-width: 0;
   }
   .mega-menu__column-title {
     margin-bottom: var(--space-sm);
     color: var(--color-foreground-soft);
   }
+  /* Flows top-to-bottom, starting a new column after 8 links, so a long
+     list of sub-categories spreads sideways instead of one very tall list. */
   .mega-menu__link-list {
     list-style: none;
     padding: 0;
     margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(8, auto);
+    justify-content: start;
+    gap: var(--space-xs) var(--space-xl);
   }
   .mega-menu__link-list a {
     text-decoration: none;
@@ -146,6 +152,7 @@
   }
   .mega-menu__features {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--space-md);
   }
   .mega-menu-feature {
